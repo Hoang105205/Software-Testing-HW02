@@ -162,11 +162,12 @@ if __name__ == "__main__":
     sys.stdout = logger
 
     input_specification = """
-        FR-12: Kiểm soát truy cập (Access Control)
-        Phân hệ Admin chỉ dành cho tài khoản có role = 'admin'.
-        Tất cả các API Admin (/api/admin/*) và các API có tính ảnh hưởng dữ liệu (POST/PUT/DELETE /api/products, /api/categories, /api/coupons) đều phải yêu cầu:
-            - Token JWT hợp lệ.
-            - role = 'admin' trong Token.
+        FR-01: Đăng ký tài khoản
+        Người dùng phải cung cấp: Họ Tên, Email, Mật khẩu.
+        Email phải có định dạng hợp lệ (user@domain.com) và là duy nhất trong hệ thống.
+        Yêu cầu mật khẩu mạnh: Tối thiểu 8 ký tự, có ít nhất 1 chữ hoa, 1 chữ thường, 1 chữ số và 1 ký tự đặc biệt (@, $, !, %, *, ?, &).
+        Phải có trường Xác nhận mật khẩu — hệ thống từ chối nếu hai trường không khớp.
+        Sau khi đăng ký thành công, người dùng được chuyển tới trang Đăng nhập.
     """
 
     print("🚀 4-Agent Pipeline khởi động... Vui lòng đợi.")

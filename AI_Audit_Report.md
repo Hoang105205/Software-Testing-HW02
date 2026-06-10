@@ -198,4 +198,114 @@ Mô hình 2: Đóng gói Skill thành các Tệp tin Instruction độc lập (P
 - Vận hành: Khi core_engine khởi động, nó quét thư mục agent_skills/ để nạp động các tệp tin này vào bộ nhớ. Hệ thống tự động ánh xạ (Mapping) xem Skill nào phù hợp để đưa vào cấu trúc system_prompt của lượt gọi API đó dựa trên ngữ cảnh tác vụ, đem lại tính linh hoạt và khả năng mở rộng tối đa cho hệ thống.
 ```
 
+## Entry 7
+### AI tool name
+* Gemini (Adaptive AI Collaborator)
+
+### Date and time
+* 2026-06-10 11:30:15
+
+### Prompt
+```text
+Trong đề bài có yêu cầu "Provide a detailed, step-by-step explanation of how you applied the technique." nhưng kết quả của AI đôi khi có đôi khi không. Do đó tôi đã thêm dòng "Cách bạn tư duy và" vào mục số 1 của Agent 2 và Agent 3. Theo bạn đánh giá thì 2 câu prompt này của tôi ổn chưa hay bạn có optimize gì thêm không?
+```
+
+### The AI output
+```text
+Việc chèn thêm cụm từ "Cách bạn tư duy và" là một kỹ thuật Prompt Engineering rất tốt giúp kích hoạt chuỗi suy luận Chain-of-Thought (CoT) của mô hình. Tuy nhiên, LLM vẫn có xu hướng làm tắt hoặc bỏ quên lý thuyết khi phải tập trung sinh bảng Markdown quá dài (hiện tượng Lost in the Middle).
+
+Để tối ưu hóa tuyệt đối và đảm bảo không bao giờ bị rơi rụng phần giải trình, chúng ta cần bổ sung kỹ thuật cưỡng chế bố cục đầu ra (Output Formatting Anchor) bằng cách ép cứng các tiêu đề Heading ở cuối Prompt cho Agent 2 và Agent 3:
+
+1. Đối với agent_2_domain_testing.md, chèn thêm đoạn neo bố cục:
+BẮT BUỘC ĐỊNH DẠNG ĐẦU RA THEO CẤU TRÚC HEADING SAU:
+### I. DETAILED STEP-BY-STEP DOMAIN ANALYSIS
+### II. DOMAIN TEST CASES TABLE
+
+2. Đối với agent_3_bva.md, chèn thêm đoạn neo bố cục:
+BẮT BUỘC ĐỊNH DẠNG ĐẦU RA THEO CẤU TRÚC HEADING SAU:
+### I. DETAILED STEP-BY-STEP BOUNDARY ANALYSIS
+### II. BOUNDARY TEST CASES TABLE
+
+Việc ép cấu trúc này buộc AI phải hoàn thành việc điền nội dung giải trình tư duy khoa học vào mục I trước khi được phép vẽ bảng kịch bản ở mục II, đáp ứng trọn vẹn barem điểm của đề bài.
+```
+
+## Entry 8
+### AI tool name
+* Gemini (Adaptive AI Collaborator)
+
+### Date and time
+* 2026-06-10 11:38:12
+
+### Prompt
+```text
+Mục chiến lược phân rã lỗi của mật khẩu (thiếu chữ hoa, chữ thường, số, ký tự đặc biệt) trong Prompt của Agent 2 và Agent 3 hiện tại có bị coi là quá hard-code không? Vì nó chỉ phù hợp cho đúng 1 chức năng đăng ký tài khoản, còn nếu đưa những đặc tả của chức năng khác vào hệ thống thì xử lý thế nào?
+```
+
+### The AI output
+```text
+Nhận định của bạn hoàn toàn chính xác. Việc đưa các ví dụ cụ thể về mật khẩu vào file kỹ năng tổng quát sẽ làm mất đi tính tái sử dụng (Reusability) của một Agent Skill thực thụ khi đối mặt với các biểu mẫu khác (như form thanh toán thẻ, form tìm kiếm).
+
+Để trừu tượng hóa (Abstract) năng lực này thành luật tư duy tổng quát cho mọi loại biểu mẫu, chúng ta cần refactor lại cấu trúc Prompt như sau:
+
+1. Thay thế luật mật khẩu cụ thể trong Agent 2 bằng "Chiến lược Phân rã ràng buộc" (Constraint Decomposition Strategy):
+"Đối với bất kỳ trường dữ liệu nào có chứa nhiều ràng buộc phức tạp lồng nhau (Ví dụ: Định dạng chuỗi, Quy tắc logic, Tập ký tự bắt buộc), bạn KHÔNG được gộp chung các lỗi vào một ca test. Phải áp dụng tư duy 'Phủ định từng thành phần' (Single Negative Fault Isolation): Thiết kế riêng biệt các kịch bản lỗi, trong đó giữ toàn bộ các ràng buộc khác ở trạng thái HỢP LỆ và chỉ làm VI PHẠM duy nhất một ràng buộc cụ thể."
+
+2. Thay thế luật mật khẩu trong Agent 3 bằng "Tư duy Đa biên" (Multi-variable Boundaries):
+"Phải tự động quét qua và xác định tất cả các biến có tính chất biên số học hoặc độ dài xuất hiện trong đặc tả (Ví dụ: Biên độ dài Họ Tên, biên số lượng sản phẩm, biên khoảng giá tiền, biên ký tự mật khẩu...). Bạn phải thực hiện tìm các điểm nhạy cảm Boundary-1, Boundary, Boundary+1 cho TỪNG trường hợp đó để tránh bỏ sót."
+
+Sự thay đổi này giúp bộ kỹ năng của Multi-Agent trở nên linh hoạt 100%, sẵn sàng xử lý chính xác bất kỳ tệp đặc tả chức năng nào được nạp vào pipeline.
+```
+
+## Entry 9
+### AI tool name
+* Gemini (Adaptive AI Collaborator)
+
+### Date and time
+* 2026-06-10 11:40:05
+
+### Prompt
+```text
+Có một vấn đề phát sinh là khi luồng chạy đến Agent cuối cùng (Agent 4 - Report Writer), nó lại tự ý dọn dẹp, tổng hợp và làm gọn mất nội dung giải trình chi tiết hoặc cắt xén bớt số lượng test cases của các Agent trước. Làm sao để giải quyết?
+```
+
+### The AI output
+```text
+Hành vi này xuất hiện do LLM mặc định gán cho vai trò "Technical Writer" xu hướng biên tập ngắn gọn, súc tích. Để kiểm soát và tước bỏ quyền tự ý sáng tạo/rút gọn của Agent 4, chúng ta cần nâng cấp tệp cấu hình bằng kỹ thuật Cưỡng chế giữ nguyên khối (Strict Injection & No-Omission Enforcement).
+
+Nội dung Prompt nâng cấp cho file agent_4_report_writer.md:
+"Nhiệm vụ tối cao của bạn là tiếp nhận kết quả thô từ các Agent trước và ghép nối chúng thành một file báo cáo Markdown duy nhất theo đúng cấu trúc hệ thống, TUYỆT ĐỐI KHÔNG ĐƯỢC TỰ Ý BIÊN TẬP HOẶC TÓM TẮT LẠI NỘI DUNG.
+QUY TẮC CƯỠNG CHẾ GIỮ NGUYÊN VẸN (STRICT NO-OMISSION RULES):
+1. GIỮ NGUYÊN 100% NỘI DUNG: Không được phép tóm tắt, rút gọn, lược bỏ hoặc làm mờ bất kỳ dòng giải trình lý thuyết nào của Agent 2 và Agent 3.
+2. KHÔNG ĐƯỢC THU GỌN BẢNG TEST CASES: Bản danh sách Test Cases của cả hai kỹ thuật nhả ra có bao nhiêu dòng thì phải sao chép chính xác toàn bộ bấy nhiêu dòng vào báo cáo cuối cùng. Nghiêm cấm hành vi sử dụng dấu ba chấm (...) hoặc gộp các ca test lại làm một.
+3. BẢO TOÀN THẺ ĐỊNH DẠNG: Giữ nguyên vẹn toàn bộ các thẻ <br> dùng để ngắt dòng trong tất cả các ô [Input Data] và [Test Steps]."
+
+Biện pháp đặt ra tối hậu thư này biến Agent 4 thành một bộ ráp nối cơ học thuần túy, bảo toàn tuyệt đối độ bao phủ và nội dung kỹ thuật từ các Agent chuyên môn phía trước.
+```
+
+## Entry 10
+### AI tool name
+* Gemini (Adaptive AI Collaborator)
+
+### Date and time
+* 2026-06-10 11:41:25
+
+### Prompt
+```text
+Ở phần cột Test Steps trong bảng kết quả trả về hiện tại đang bị thiếu thông tin thao tác cụ thể, chỉ ghi chung chung là "Nhập thông tin đăng ký" hoặc "Submit form". Trong khi tôi muốn ghi rõ chi tiết Bước 1 điền cái gì, Bước 2 điền cái gì bám sát dữ liệu thực tế. Hãy tối ưu Prompt cho các Agent.
+```
+
+### The AI output
+```text
+Để loại bỏ tình trạng Agent sinh các bước thực hiện mang tính định tính mơ hồ, chúng ta cần nhúng quy tắc "Kịch bản hóa hành vi nhập liệu" (Behavioral Data Mapping) trực tiếp vào chỉ thị của Agent thiết kế (Agent 2, Agent 3) và Agent tổng hợp (Agent 4):
+
+1. Cập nhật chỉ thị trong ô [Test Steps] cho Agent 2 (Domain) và Agent 3 (BVA):
+"QUY TẮC CỘT TEST STEPS (BẮT BUỘC): KHÔNG ĐƯỢC ghi chung chung kiểu 'Nhập thông tin form'. Bạn phải viết chi tiết hành vi tương tác với giao diện theo từng bước, chỉ rõ trường nào nhận giá trị nào từ cột Input Data và phân tách bằng thẻ <br>.
+* Ví dụ chuẩn định dạng: 1. Truy cập trang đăng ký.<br>2. Nhập chuỗi [Giá trị họ tên] vào trường Họ Tên, nhập [Giá trị email] vào trường Email, nhập chuỗi [Giá trị mật khẩu] vào trường Mật khẩu, nhập [Giá trị xác nhận mật khẩu] vào trường Xác nhận mật khẩu.<br>3. Click chuột vào nút 'Đăng ký' để gửi dữ liệu hệ thống."
+
+2. Bổ sung điều khoản giám sát chặt chẽ cho Agent 4 (Report Writer):
+"TUYỆT ĐỐI KHÔNG ĐƯỢC rút gọn cột [Test Steps] thành các câu ngắn định tính (ví dụ: Không được tự ý đổi các bước nhập chi tiết thành câu 'Nhập thông tin đăng ký'). Phải giữ nguyên văn các bước thao tác chi tiết (Bước 1 điền gì, Bước 2 nhập chuỗi gì...) mà Agent trước đã sinh ra."
+
+Sự bổ sung này bắt buộc mô hình phải ánh xạ chính xác bộ dữ liệu thực tế (Full Data Payload) từ cột Input Data sang từng hành động click, nhập chuỗi trong cột Test Steps, giúp kịch bản kiểm thử đạt độ tường minh tối đa chuẩn kỹ sư QA chuyên nghiệp.
+```
+
 
