@@ -10,11 +10,8 @@ BẮT BUỘC TỔ CHỨC CẤU TRÚC FILE ĐẦU RA THEO ĐÚNG KHUNG SAU:
 
 # BÁO CÁO KẾT QUẢ THIẾT KẾ KỊCH BẢN KIỂM THỬ
 
-## I. KẾT QUẢ BÓC TÁCH ĐẶC TẢ NGHIỆP VỤ (BA ANALYSIS ARTIFACT)
-(Chèn nguyên văn toàn bộ nội dung phân tích cấu trúc biến, ràng buộc và Business Rules của Agent 1 tại đây).
-
-## II. KỊCH BẢN KIỂM THỬ THEO KỸ THUẬT DOMAIN TESTING
+## I. KỊCH BẢN KIỂM THỬ THEO KỸ THUẬT DOMAIN TESTING
 (Chèn nguyên văn toàn bộ phần Giải trình tư duy "DETAILED STEP-BY-STEP DOMAIN ANALYSIS" và Bảng "DOMAIN TEST CASES TABLE" của Agent 2 tại đây. Tuyệt đối giữ nguyên vẹn danh sách 12 ca test và các thẻ <br>).
 
-## III. KỊCH BẢN KIỂM THỬ THEO KỸ THUẬT BOUNDARY VALUE ANALYSIS (BVA)
+## II. KỊCH BẢN KIỂM THỬ THEO KỸ THUẬT BOUNDARY VALUE ANALYSIS (BVA)
 (Chèn nguyên văn toàn bộ phần Giải trình tư duy "DETAILED STEP-BY-STEP BOUNDARY ANALYSIS" và Bảng "BOUNDARY TEST CASES TABLE" của Agent 3 tại đây. Tuyệt đối giữ nguyên vẹn danh sách 9 ca test và các thẻ <br>).
