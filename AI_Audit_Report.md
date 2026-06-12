@@ -616,3 +616,277 @@ Xin lỗi, nhưng không có thông tin về kết quả bóc tách đặc tả 
 
 
 
+
+---
+
+## Entry 12
+
+### AI tool name
+* llama-3.3-70b-versatile (via Groq API — 4-Agent Pipeline with Decoupled Skills)
+
+### Date and time
+* 2026-06-11 12:21:23
+
+### Prompt
+#### [Input Feature Specification]
+```text
+FR-10: Trạng thái Đơn hàng (Order State Machine)
+        Đơn hàng có 5 trạng thái và phải tuân theo sơ đồ chuyển đổi sau:
+
+                         [Admin xác nhận]          [Admin giao hàng]      [Admin hoàn tất]
+  ┌──────────┐ ─────────────────► ┌───────────┐ ──────────────► ┌──────────┐ ──────────► ┌───────────┐
+  │ pending  │                    │ confirmed │                  │ shipping │             │ delivered │
+  └──────────┘                    └───────────┘                  └──────────┘             └───────────┘
+       │                               │
+       │ [User/Admin hủy]              │ [User/Admin hủy]
+       ▼                               ▼
+  ┌──────────┐                    ┌──────────┐
+  │ canceled │                    │ canceled │
+  └──────────┘                    └──────────┘
+
+    Ràng buộc trạng thái kết thúc (Final States):
+    - Trạng thái delivered và canceled là trạng thái kết thúc — không được phép chuyển sang bất kỳ trạng thái nào khác.
+    - Khi đơn hàng đã ở trạng thái shipping, User không được phép tự hủy — chỉ Admin mới có thể thao tác.
+    - Mọi chuyển đổi không hợp lệ phải trả về lỗi với thông báo phù hợp.
+```
+
+#### [Agent 1 System Prompt — Spec Analyst]
+```text
+Bạn là một Business Analyst (BA) chuyên phân tích đặc tả phần mềm.
+Nhiệm vụ của bạn là phân tích tài liệu spec được cung cấp và bóc tách thành các mục rõ ràng:
+
+1. Danh sách các biến đầu vào (Input variables).
+2. Kiểu dữ liệu và Ràng buộc (Constraints/Datatypes) chi tiết của từng biến (Ví dụ: độ dài tối thiểu/tối đa, tập ký tự cho phép).
+3. Các quy tắc nghiệp vụ (Business Rules) và logic ngầm quan trọng ảnh hưởng trực tiếp đến kết quả hệ thống.
+   Trả lời súc tích, cấu trúc Markdown rõ ràng bằng tiếng Việt.
+```
+
+#### [Agent 2 System Prompt — Domain Testing]
+```text
+Bạn là ISTQB Senior QA Engineer chuyên sâu về kỹ thuật Equivalence Partitioning (Phân hoạch miền tương đương) và Combinatorial Testing (Kiểm thử tổ hợp).
+Dựa trên kết quả phân tích đặc tả từ BA, nhiệm vụ của bạn là thiết kế một bộ kịch bản kiểm thử có độ bao phủ tối đa (Maximum Coverage).
+
+Nhiệm vụ cụ thể:
+1. Provide a detailed, step-by-step explanation of how you applied the technique: Trình bày chi tiết bằng tiếng Việt cách bạn tư duy, bóc tách và xác định rõ ràng tất cả các miền tương đương Hợp lệ (Valid Partitions) và Không hợp lệ (Invalid Partitions) cho TỪNG biến đầu vào. 
+2. Xuất bảng Test Cases dạng Markdown bắt buộc phải chứa các giá trị kiểm thử cụ thể (Concrete Test Data). KHÔNG ghi định tính chung chung.
+3. Bảng kịch bản phải tuân thủ chính xác cấu trúc cột sau:
+| Test Case ID | Description | Input Data | Test Steps | Expected Result | Actual Result | Status | Tested By | Date Tested |
+
+QUY TẮC BẮT BUỘC ĐỂ KHÔNG BỎ SÓT KỊCH BẢN VÀ BƯỚC THỰC HIỆN (ANTI-LAZINESS RULES):
+- Số lượng kịch bản tối thiểu: Bắt buộc phải sinh ra ít nhất từ 8 đến 12 test cases trở lên cho một tính năng form chuẩn.
+- Chiến lược Phân rã lỗi (Constraint Decomposition Strategy): Đối với bất kỳ trường dữ liệu nào có chứa nhiều ràng buộc phức tạp lồng nhau, phải áp dụng tư duy "Phủ định từng thành phần" (Single Negative Fault Isolation).
+- QUY TẮC CỘT TEST STEPS (BẮT BUỘC): KHÔNG ĐƯỢC ghi chung chung kiểu "Nhập thông tin form". Bạn phải viết chi tiết hành vi tương tác với giao diện theo từng bước, chỉ rõ trường nào nhận giá trị nào từ cột Input Data và phân tách bằng thẻ <br>. 
+  * Ví dụ chuẩn định dạng: 1. Truy cập trang đăng ký.<br>2. Điền trường Họ Tên là "[Giá trị họ tên thực tế]", điền trường Email là "[Giá trị email thực tế]", điền trường Mật khẩu là "[Giá trị mật khẩu thực tế]", điền trường Xác nhận mật khẩu là "[Giá trị xác nhận mật khẩu thực tế]".<br>3. Nhấn nút "Đăng ký".
+- Trong ô [Input Data]: BẮT BUỘC cung cấp Full Data Payload. Mỗi trường viết trên một dòng, cách nhau bằng thẻ <br>.
+- Kịch bản ID bắt đầu bằng format: FR-XX-DT-01, FR-XX-DT-02...
+- Tách biệt rõ ràng phần giải trình lý thuyết và bảng test cases.
+
+BẮT BUỘC ĐỊNH DẠNG ĐẦU RA THEO CẤU TRÚC HEADING SAU:
+### I. DETAILED STEP-BY-STEP DOMAIN ANALYSIS
+### II. DOMAIN TEST CASES TABLE
+```
+
+#### [Agent 3 System Prompt — BVA]
+```text
+Bạn là ISTQB Senior QA Engineer chuyên sâu về kỹ thuật Boundary Value Analysis (BVA).
+Hãy lưu ý: BVA chỉ áp dụng cho các biến có ranh giới số lượng hoặc độ dài số học (Ví dụ: Độ dài chuỗi, Giá trị số). KHÔNG áp dụng BVA cho các biến định tính logic như định dạng cấu trúc Email.
+
+Nhiệm vụ của bạn bao gồm:
+1. Provide a detailed, step-by-step explanation of how you applied the technique: Trình bày chi tiết từng bước bằng tiếng Việt cách bạn tư duy, phân tích toán học để xác định rõ các điểm ranh giới nhạy cảm: Boundary, Boundary - 1, Boundary + 1 (cho cả biên dưới MIN và biên trên MAX nếu có quy định rõ hoặc theo giới hạn hệ thống). Hãy giải thích lý do chuyên môn tại sao các điểm lân cận biên này lại có nguy cơ phát sinh lỗi cao.
+2. Xuất bảng Test Cases dạng Markdown. Toàn bộ kịch bản BVA BẮT BUỘC phải sử dụng dữ liệu kiểm thử cụ thể, chính xác đến từng ký tự (Concrete Test Data). KHÔNG ghi chung chung.
+3. Bảng kịch bản phải tuân thủ chính xác cấu trúc cột sau:
+| Test Case ID | Description | Input Data | Test Steps | Expected Result | Actual Result | Status | Tested By | Date Tested |
+
+QUY TẮC BẮT BUỘC ĐỂ KHÔNG BỎ SÓT KỊCH BẢN VÀ BƯỚC THỰC HIỆN (ANTI-LAZINESS RULES):
+- Số lượng kịch bản tối thiểu: Bắt buộc phải sinh ra ít nhất từ 6 đến 9 test cases biên trở lên.
+- Đa biên (Multi-variable Boundaries): Phải tự động quét qua và xác định tất cả các biến có tính chất biên số học hoặc độ dài xuất hiện trong đặc tả. Bạn phải thực hiện tìm các điểm nhạy cảm Boundary-1, Boundary, Boundary+1 cho TỪNG trường hợp đó để tránh bỏ sót.
+- Quy tắc cô lập biên (Variable Isolation): Khi kiểm thử biên của một biến, toàn bộ các trường dữ liệu bắt buộc khác trên form BẮT BUỘC phải được điền đầy đủ bằng các giá trị HỢP LỆ nhằm cô lập hành vi lỗi.
+- QUY TẮC CỘT TEST STEPS (BẮT BUỘC): KHÔNG ĐƯỢC ghi chung chung kiểu "Submit form". Bạn phải ghi chi tiết từng thao tác nhập liệu thực tế tương ứng với dữ liệu ở cột Input Data và ngắt dòng bằng thẻ <br>.
+  * Ví dụ chuẩn định dạng: 1. Truy cập trang đăng ký.<br>2. Nhập chuỗi "[Giá trị họ tên]" vào trường Họ Tên, nhập "[Giá trị email]" vào trường Email, nhập chuỗi có độ dài biên "[Giá trị mật khẩu]" vào trường Mật khẩu, nhập "[Giá trị xác nhận mật khẩu]" vào trường Xác nhận mật khẩu.<br>3. Click chuột vào nút "Đăng ký" để gửi dữ liệu hệ thống.
+- Trong ô [Input Data]: BẮT BUỘC cung cấp Full Data Payload. Mỗi trường nằm trên một dòng riêng biệt, cách dòng bằng thẻ <br>. Hãy ghi kèm độ dài hoặc giá trị số thực tế bên cạnh biến đang xét biên để chứng minh tính chính xác toán học biên.
+- Kịch bản ID bắt đầu bằng format: FR-XX-BVA-01, FR-XX-BVA-02...
+
+BẮT BUỘC ĐỊNH DẠNG ĐẦU RA THEO CẤU TRÚC HEADING SAU:
+### I. DETAILED STEP-BY-STEP BOUNDARY ANALYSIS
+### II. BOUNDARY TEST CASES TABLE
+```
+
+#### [Agent 4 System Prompt — Report Writer]
+```text
+Bạn là Technical Writer chuyên nghiệp, đóng vai trò là một bộ lắp ráp cấu trúc tài liệu kiểm thử phần mềm chất lượng cao. 
+Nhiệm vụ tối cao của bạn là tiếp nhận kết quả thô từ các Agent trước và ghép nối chúng thành một file báo cáo Markdown duy nhất theo đúng cấu trúc hệ thống, TUYỆT ĐỐI KHÔNG ĐƯỢC TỰ Ý BIÊN TẬP LẠI NỘI DUNG CHUYÊN MÔN.
+
+QUY TẮC CƯỠNG CHẾ GIỮ NGUYÊN VẸN (STRICT NO-OMISSION RULES):
+1. GIỮ NGUYÊN 100% NỘI DUNG: Không được phép tóm tắt, rút gọn, lược bỏ hoặc làm mờ bất kỳ một từ, một dòng giải trình lý thuyết (Detailed Analysis Step-by-Step) nào của Agent 2 và Agent 3.
+2. KHÔNG ĐƯỢC THU GỌN BẢNG TEST CASES: Bản danh sách Test Cases của cả hai kỹ thuật nhả ra có bao nhiêu dòng (ví dụ: từ FR-01-DT-01 đến FR-01-DT-12 và FR-01-BVA-01 đến FR-01-BVA-09) thì phải sao chép chính xác toàn bộ bấy nhiêu dòng vào báo cáo cuối cùng. Nghiêm cấm hành vi sử dụng dấu ba chấm (...) hoặc gộp các ca test lại làm một.
+3. BẢO TOÀN THẺ ĐỊNH DẠNG <br>: Giữ nguyên vẹn toàn bộ các thẻ <br> dùng để ngắt dòng trong tất cả các ô [Input Data] và [Test Steps]. Không được xóa thẻ hoặc tự ý chuyển đổi chúng thành dấu xuống dòng thông thường để tránh làm vỡ kết cấu hiển thị của bảng Markdown.
+
+BẮT BUỘC TỔ CHỨC CẤU TRÚC FILE ĐẦU RA THEO ĐÚNG KHUNG SAU:
+
+# BÁO CÁO KẾT QUẢ THIẾT KẾ KỊCH BẢN KIỂM THỬ
+
+## I. KẾT QUẢ BÓC TÁCH ĐẶC TẢ NGHIỆP VỤ (BA ANALYSIS ARTIFACT)
+(Chèn nguyên văn toàn bộ nội dung phân tích cấu trúc biến, ràng buộc và Business Rules của Agent 1 tại đây).
+
+## II. KỊCH BẢN KIỂM THỬ THEO KỸ THUẬT DOMAIN TESTING
+(Chèn nguyên văn toàn bộ phần Giải trình tư duy "DETAILED STEP-BY-STEP DOMAIN ANALYSIS" và Bảng "DOMAIN TEST CASES TABLE" của Agent 2 tại đây. Tuyệt đối giữ nguyên vẹn danh sách 12 ca test và các thẻ <br>).
+
+## III. KỊCH BẢN KIỂM THỬ THEO KỸ THUẬT BOUNDARY VALUE ANALYSIS (BVA)
+(Chèn nguyên văn toàn bộ phần Giải trình tư duy "DETAILED STEP-BY-STEP BOUNDARY ANALYSIS" và Bảng "BOUNDARY TEST CASES TABLE" của Agent 3 tại đây. Tuyệt đối giữ nguyên vẹn danh sách 9 ca test và các thẻ <br>).
+```
+
+### The AI output
+
+**[Agent 1 — Spec Analysis]**
+### Phân tích Spec: Trạng thái Đơn hàng (Order State Machine)
+
+#### 1. Danh sách các biến đầu vào (Input variables)
+- Trạng thái hiện tại của đơn hàng (current_state)
+- Hành động được thực hiện (action): xác nhận, giao hàng, hoàn tất, hủy
+- Người thực hiện hành động (actor): Admin, User
+
+#### 2. Kiểu dữ liệu và Ràng buộc (Constraints/Datatypes)
+- Trạng thái đơn hàng (current_state): chuỗi, có 5 giá trị có thể: `pending`, `confirmed`, `shipping`, `delivered`, `canceled`
+- Hành động (action): chuỗi, có 4 giá trị có thể: `xác nhận`, `giao hàng`, `hoàn tất`, `hủy`
+- Người thực hiện hành động (actor): chuỗi, có 2 giá trị có thể: `Admin`, `User`
+
+#### 3. Các quy tắc nghiệp vụ (Business Rules) và logic ngầm quan trọng
+- **Quy tắc 1:** Đơn hàng chỉ có thể chuyển đổi trạng thái theo sơ đồ đã định nghĩa.
+- **Quy tắc 2:** Trạng thái `delivered` và `canceled` là trạng thái kết thúc, không thể chuyển sang trạng thái khác.
+- **Quy tắc 3:** Khi đơn hàng ở trạng thái `shipping`, chỉ `Admin` mới có thể hủy đơn hàng.
+- **Quy tắc 4:** Mọi chuyển đổi trạng thái không hợp lệ phải trả về lỗi với thông báo phù hợp.
+- **Quy tắc 5:** Chỉ `Admin` mới có thể thực hiện hành động `xác nhận`, `giao hàng`, `hoàn tất`.
+- **Quy tắc 6:** Cả `Admin` và `User` có thể hủy đơn hàng ở trạng thái `pending` và `confirmed`.
+
+**[Agent 2 — Domain Testing]**
+### I. DETAILED STEP-BY-STEP DOMAIN ANALYSIS
+
+Để thiết kế bộ kịch bản kiểm thử cho trạng thái đơn hàng, chúng ta cần phân tích từng biến đầu vào và xác định các miền tương đương hợp lệ và không hợp lệ.
+
+1. **Trạng thái hiện tại của đơn hàng (current_state)**: 
+   - Miền hợp lệ: `pending`, `confirmed`, `shipping`, `delivered`, `canceled`
+   - Miền không hợp lệ: bất kỳ giá trị nào khác ngoài 5 giá trị trên
+
+2. **Hành động được thực hiện (action)**: 
+   - Miền hợp lệ: `xác nhận`, `giao hàng`, `hoàn tất`, `hủy`
+   - Miền không hợp lệ: bất kỳ giá trị nào khác ngoài 4 giá trị trên
+
+3. **Người thực hiện hành động (actor)**: 
+   - Miền hợp lệ: `Admin`, `User`
+   - Miền không hợp lệ: bất kỳ giá trị nào khác ngoài 2 giá trị trên
+
+Áp dụng quy tắc "Phủ định từng thành phần" (Single Negative Fault Isolation) cho từng trường dữ liệu có chứa nhiều ràng buộc phức tạp lồng nhau, chúng ta sẽ kiểm tra từng thành phần một cách độc lập.
+
+### II. DOMAIN TEST CASES TABLE
+
+| Test Case ID | Description | Input Data | Test Steps | Expected Result | Actual Result | Status | Tested By | Date Tested |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| FR-01-DT-01 | Kiểm tra chuyển đổi trạng thái từ `pending` sang `confirmed` bởi `Admin` | current_state: pending<br>action: xác nhận<br>actor: Admin | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `pending`.<br>3. Thực hiện hành động `xác nhận` bởi `Admin`. | Trạng thái đơn hàng chuyển thành `confirmed` |  |  |  |  |
+| FR-01-DT-02 | Kiểm tra chuyển đổi trạng thái từ `confirmed` sang `shipping` bởi `Admin` | current_state: confirmed<br>action: giao hàng<br>actor: Admin | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `confirmed`.<br>3. Thực hiện hành động `giao hàng` bởi `Admin`. | Trạng thái đơn hàng chuyển thành `shipping` |  |  |  |  |
+| FR-01-DT-03 | Kiểm tra chuyển đổi trạng thái từ `shipping` sang `delivered` bởi `Admin` | current_state: shipping<br>action: hoàn tất<br>actor: Admin | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `shipping`.<br>3. Thực hiện hành động `hoàn tất` bởi `Admin`. | Trạng thái đơn hàng chuyển thành `delivered` |  |  |  |  |
+| FR-01-DT-04 | Kiểm tra hủy đơn hàng ở trạng thái `pending` bởi `User` | current_state: pending<br>action: hủy<br>actor: User | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `pending`.<br>3. Thực hiện hành động `hủy` bởi `User`. | Trạng thái đơn hàng chuyển thành `canceled` |  |  |  |  |
+| FR-01-DT-05 | Kiểm tra chuyển đổi trạng thái không hợp lệ từ `delivered` sang `confirmed` | current_state: delivered<br>action: xác nhận<br>actor: Admin | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `delivered`.<br>3. Thực hiện hành động `xác nhận` bởi `Admin`. | Trả về lỗi với thông báo phù hợp |  |  |  |  |
+| FR-01-DT-06 | Kiểm tra chuyển đổi trạng thái không hợp lệ từ `canceled` sang `shipping` | current_state: canceled<br>action: giao hàng<br>actor: Admin | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `canceled`.<br>3. Thực hiện hành động `giao hàng` bởi `Admin`. | Trả về lỗi với thông báo phù hợp |  |  |  |  |
+| FR-01-DT-07 | Kiểm tra hành động không hợp lệ bởi `User` | current_state: pending<br>action: xác nhận<br>actor: User | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `pending`.<br>3. Thực hiện hành động `xác nhận` bởi `User`. | Trả về lỗi với thông báo phù hợp |  |  |  |  |
+| FR-01-DT-08 | Kiểm tra hủy đơn hàng ở trạng thái `shipping` bởi `Admin` | current_state: shipping<br>action: hủy<br>actor: Admin | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `shipping`.<br>3. Thực hiện hành động `hủy` bởi `Admin`. | Trạng thái đơn hàng chuyển thành `canceled` |  |  |  |  |
+| FR-01-DT-09 | Kiểm tra chuyển đổi trạng thái từ `pending` sang `confirmed` bởi `User` | current_state: pending<br>action: xác nhận<br>actor: User | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `pending`.<br>3. Thực hiện hành động `xác nhận` bởi `User`. | Trả về lỗi với thông báo phù hợp |  |  |  |  |
+| FR-01-DT-10 | Kiểm tra chuyển đổi trạng thái không hợp lệ từ `pending` sang `delivered` | current_state: pending<br>action: hoàn tất<br>actor: Admin | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `pending`.<br>3. Thực hiện hành động `hoàn tất` bởi `Admin`. | Trả về lỗi với thông báo phù hợp |  |  |  |  |
+| FR-01-DT-11 | Kiểm tra chuyển đổi trạng thái từ `confirmed` sang `delivered` | current_state: confirmed<br>action: hoàn tất<br>actor: Admin | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `confirmed`.<br>3. Thực hiện hành động `hoàn tất` bởi `Admin`. | Trả về lỗi với thông báo phù hợp |  |  |  |  |
+| FR-01-DT-12 | Kiểm tra hủy đơn hàng ở trạng thái `confirmed` bởi `User` | current_state: confirmed<br>action: hủy<br>actor: User | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `confirmed`.<br>3. Thực hiện hành động `hủy` bởi `User`. | Trạng thái đơn hàng chuyển thành `canceled` |  |  |  |  |
+
+**[Agent 3 — BVA]**
+### I. DETAILED STEP-BY-STEP BOUNDARY ANALYSIS
+
+Để áp dụng kỹ thuật Boundary Value Analysis (BVA) cho trạng thái đơn hàng và các hành động liên quan, chúng ta cần xác định các điểm ranh giới nhạy cảm (Boundary) cho từng biến đầu vào có thể có giá trị số hoặc độ dài cụ thể. Tuy nhiên, trong trường hợp này, các biến đầu vào như trạng thái đơn hàng, hành động, và người thực hiện hành động đều là chuỗi và có giá trị cố định, không có độ dài hoặc giá trị số cụ thể cần kiểm tra.
+
+Tuy nhiên, chúng ta có thể áp dụng BVA cho các biến có thể có giá trị biên như số lượng hành động có thể thực hiện, số lượng trạng thái đơn hàng, v.v. Nhưng trong trường hợp này, các giá trị này đều được định nghĩa rõ ràng và không có độ dài hoặc giá trị số cần kiểm tra.
+
+Chúng ta sẽ tập trung vào việc kiểm tra các quy tắc nghiệp vụ và logic ngầm quan trọng đã được định nghĩa. Mỗi quy tắc sẽ được kiểm tra với các trường hợp biên khác nhau để đảm bảo rằng hệ thống hoạt động đúng như mong đợi.
+
+### II. BOUNDARY TEST CASES TABLE
+
+Dưới đây là các test case được thiết kế để kiểm tra các quy tắc nghiệp vụ và logic ngầm quan trọng:
+
+| Test Case ID | Description | Input Data | Test Steps | Expected Result | Actual Result | Status | Tested By | Date Tested |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| FR-01-BVA-01 | Kiểm tra chuyển đổi trạng thái đơn hàng từ `pending` sang `confirmed` | Trạng thái hiện tại: `pending`<br>Hành động: `xác nhận`<br>Người thực hiện hành động: `Admin` | 1. Tạo đơn hàng mới với trạng thái `pending`.<br>2. Thực hiện hành động `xác nhận` với người thực hiện hành động là `Admin`.<br>3. Kiểm tra trạng thái đơn hàng sau khi thực hiện hành động. | Trạng thái đơn hàng được chuyển đổi thành `confirmed`. |  |  |  |  |
+| FR-01-BVA-02 | Kiểm tra chuyển đổi trạng thái đơn hàng từ `confirmed` sang `shipping` | Trạng thái hiện tại: `confirmed`<br>Hành động: `giao hàng`<br>Người thực hiện hành động: `Admin` | 1. Tạo đơn hàng mới với trạng thái `confirmed`.<br>2. Thực hiện hành động `giao hàng` với người thực hiện hành động là `Admin`.<br>3. Kiểm tra trạng thái đơn hàng sau khi thực hiện hành động. | Trạng thái đơn hàng được chuyển đổi thành `shipping`. |  |  |  |  |
+| FR-01-BVA-03 | Kiểm tra chuyển đổi trạng thái đơn hàng từ `shipping` sang `delivered` | Trạng thái hiện tại: `shipping`<br>Hành động: `hoàn tất`<br>Người thực hiện hành động: `Admin` | 1. Tạo đơn hàng mới với trạng thái `shipping`.<br>2. Thực hiện hành động `hoàn tất` với người thực hiện hành động là `Admin`.<br>3. Kiểm tra trạng thái đơn hàng sau khi thực hiện hành động. | Trạng thái đơn hàng được chuyển đổi thành `delivered`. |  |  |  |  |
+| FR-01-BVA-04 | Kiểm tra hủy đơn hàng ở trạng thái `pending` | Trạng thái hiện tại: `pending`<br>Hành động: `hủy`<br>Người thực hiện hành động: `User` | 1. Tạo đơn hàng mới với trạng thái `pending`.<br>2. Thực hiện hành động `hủy` với người thực hiện hành động là `User`.<br>3. Kiểm tra trạng thái đơn hàng sau khi thực hiện hành động. | Trạng thái đơn hàng được chuyển đổi thành `canceled`. |  |  |  |  |
+| FR-01-BVA-05 | Kiểm tra hủy đơn hàng ở trạng thái `confirmed` | Trạng thái hiện tại: `confirmed`<br>Hành động: `hủy`<br>Người thực hiện hành động: `Admin` | 1. Tạo đơn hàng mới với trạng thái `confirmed`.<br>2. Thực hiện hành động `hủy` với người thực hiện hành động là `Admin`.<br>3. Kiểm tra trạng thái đơn hàng sau khi thực hiện hành động. | Trạng thái đơn hàng được chuyển đổi thành `canceled`. |  |  |  |  |
+| FR-01-BVA-06 | Kiểm tra chuyển đổi trạng thái đơn hàng không hợp lệ | Trạng thái hiện tại: `delivered`<br>Hành động: `giao hàng`<br>Người thực hiện hành động: `Admin` | 1. Tạo đơn hàng mới với trạng thái `delivered`.<br>2. Thực hiện hành động `giao hàng` với người thực hiện hành động là `Admin`.<br>3. Kiểm tra trạng thái đơn hàng sau khi thực hiện hành động. | Hệ thống trả về lỗi với thông báo phù hợp. |  |  |  |  |
+| FR-01-BVA-07 | Kiểm tra chuyển đổi trạng thái đơn hàng không hợp lệ | Trạng thái hiện tại: `canceled`<br>Hành động: `xác nhận`<br>Người thực hiện hành động: `Admin` | 1. Tạo đơn hàng mới với trạng thái `canceled`.<br>2. Thực hiện hành động `xác nhận` với người thực hiện hành động là `Admin`.<br>3. Kiểm tra trạng thái đơn hàng sau khi thực hiện hành động. | Hệ thống trả về lỗi với thông báo phù hợp. |  |  |  |  |
+| FR-01-BVA-08 | Kiểm tra chuyển đổi trạng thái đơn hàng không hợp lệ | Trạng thái hiện tại: `pending`<br>Hành động: `hoàn tất`<br>Người thực hiện hành động: `Admin` | 1. Tạo đơn hàng mới với trạng thái `pending`.<br>2. Thực hiện hành động `hoàn tất` với người thực hiện hành động là `Admin`.<br>3. Kiểm tra trạng thái đơn hàng sau khi thực hiện hành động. | Hệ thống trả về lỗi với thông báo phù hợp. |  |  |  |  |
+| FR-01-BVA-09 | Kiểm tra chuyển đổi trạng thái đơn hàng không hợp lệ | Trạng thái hiện tại: `confirmed`<br>Hành động: `hủy`<br>Người thực hiện hành động: `User` | 1. Tạo đơn hàng mới với trạng thái `confirmed`.<br>2. Thực hiện hành động `hủy` với người thực hiện hành động là `User`.<br>3. Kiểm tra trạng thái đơn hàng sau khi thực hiện hành động. | Trạng thái đơn hàng được chuyển đổi thành `canceled`. |  |  |  |  |
+
+Lưu ý rằng các test case trên chỉ là một số ví dụ và có thể cần thêm các test case khác để đảm bảo rằng hệ thống hoạt động đúng như mong đợi.
+
+**[Final Delivered Artifact]**
+# BÁO CÁO KẾT QUẢ THIẾT KẾ KỊCH BẢN KIỂM THỬ
+
+## I. KẾT QUẢ BÓC TÁCH ĐẶC TẢ NGHIỆP VỤ (BA ANALYSIS ARTIFACT)
+Xin lỗi, nhưng không có thông tin về kết quả bóc tách đặc tả nghiệp vụ (BA Analysis Artifact) từ Agent 1 được cung cấp. Để hoàn thành báo cáo này, thông tin chi tiết về phân tích cấu trúc biến, ràng buộc và Business Rules là cần thiết.
+
+## II. KỊCH BẢN KIỂM THỬ THEO KỸ THUẬT DOMAIN TESTING
+### I. DETAILED STEP-BY-STEP DOMAIN ANALYSIS
+
+Để thiết kế bộ kịch bản kiểm thử cho trạng thái đơn hàng, chúng ta cần phân tích từng biến đầu vào và xác định các miền tương đương hợp lệ và không hợp lệ.
+
+1. **Trạng thái hiện tại của đơn hàng (current_state)**: 
+   - Miền hợp lệ: `pending`, `confirmed`, `shipping`, `delivered`, `canceled`
+   - Miền không hợp lệ: bất kỳ giá trị nào khác ngoài 5 giá trị trên
+
+2. **Hành động được thực hiện (action)**: 
+   - Miền hợp lệ: `xác nhận`, `giao hàng`, `hoàn tất`, `hủy`
+   - Miền không hợp lệ: bất kỳ giá trị nào khác ngoài 4 giá trị trên
+
+3. **Người thực hiện hành động (actor)**: 
+   - Miền hợp lệ: `Admin`, `User`
+   - Miền không hợp lệ: bất kỳ giá trị nào khác ngoài 2 giá trị trên
+
+Áp dụng quy tắc "Phủ định từng thành phần" (Single Negative Fault Isolation) cho từng trường dữ liệu có chứa nhiều ràng buộc phức tạp lồng nhau, chúng ta sẽ kiểm tra từng thành phần một cách độc lập.
+
+### II. DOMAIN TEST CASES TABLE
+
+| Test Case ID | Description | Input Data | Test Steps | Expected Result | Actual Result | Status | Tested By | Date Tested |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| FR-01-DT-01 | Kiểm tra chuyển đổi trạng thái từ `pending` sang `confirmed` bởi `Admin` | current_state: pending<br>action: xác nhận<br>actor: Admin | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `pending`.<br>3. Thực hiện hành động `xác nhận` bởi `Admin`. | Trạng thái đơn hàng chuyển thành `confirmed` |  |  |  |  |
+| FR-01-DT-02 | Kiểm tra chuyển đổi trạng thái từ `confirmed` sang `shipping` bởi `Admin` | current_state: confirmed<br>action: giao hàng<br>actor: Admin | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `confirmed`.<br>3. Thực hiện hành động `giao hàng` bởi `Admin`. | Trạng thái đơn hàng chuyển thành `shipping` |  |  |  |  |
+| FR-01-DT-03 | Kiểm tra chuyển đổi trạng thái từ `shipping` sang `delivered` bởi `Admin` | current_state: shipping<br>action: hoàn tất<br>actor: Admin | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `shipping`.<br>3. Thực hiện hành động `hoàn tất` bởi `Admin`. | Trạng thái đơn hàng chuyển thành `delivered` |  |  |  |  |
+| FR-01-DT-04 | Kiểm tra hủy đơn hàng ở trạng thái `pending` bởi `User` | current_state: pending<br>action: hủy<br>actor: User | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `pending`.<br>3. Thực hiện hành động `hủy` bởi `User`. | Trạng thái đơn hàng chuyển thành `canceled` |  |  |  |  |
+| FR-01-DT-05 | Kiểm tra chuyển đổi trạng thái không hợp lệ từ `delivered` sang `confirmed` | current_state: delivered<br>action: xác nhận<br>actor: Admin | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `delivered`.<br>3. Thực hiện hành động `xác nhận` bởi `Admin`. | Trả về lỗi với thông báo phù hợp |  |  |  |  |
+| FR-01-DT-06 | Kiểm tra chuyển đổi trạng thái không hợp lệ từ `canceled` sang `shipping` | current_state: canceled<br>action: giao hàng<br>actor: Admin | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `canceled`.<br>3. Thực hiện hành động `giao hàng` bởi `Admin`. | Trả về lỗi với thông báo phù hợp |  |  |  |  |
+| FR-01-DT-07 | Kiểm tra hành động không hợp lệ bởi `User` | current_state: pending<br>action: xác nhận<br>actor: User | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `pending`.<br>3. Thực hiện hành động `xác nhận` bởi `User`. | Trả về lỗi với thông báo phù hợp |  |  |  |  |
+| FR-01-DT-08 | Kiểm tra hủy đơn hàng ở trạng thái `shipping` bởi `Admin` | current_state: shipping<br>action: hủy<br>actor: Admin | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `shipping`.<br>3. Thực hiện hành động `hủy` bởi `Admin`. | Trạng thái đơn hàng chuyển thành `canceled` |  |  |  |  |
+| FR-01-DT-09 | Kiểm tra chuyển đổi trạng thái từ `pending` sang `confirmed` bởi `User` | current_state: pending<br>action: xác nhận<br>actor: User | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `pending`.<br>3. Thực hiện hành động `xác nhận` bởi `User`. | Trả về lỗi với thông báo phù hợp |  |  |  |  |
+| FR-01-DT-10 | Kiểm tra chuyển đổi trạng thái không hợp lệ từ `pending` sang `delivered` | current_state: pending<br>action: hoàn tất<br>actor: Admin | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `pending`.<br>3. Thực hiện hành động `hoàn tất` bởi `Admin`. | Trả về lỗi với thông báo phù hợp |  |  |  |  |
+| FR-01-DT-11 | Kiểm tra chuyển đổi trạng thái từ `confirmed` sang `delivered` | current_state: confirmed<br>action: hoàn tất<br>actor: Admin | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `confirmed`.<br>3. Thực hiện hành động `hoàn tất` bởi `Admin`. | Trả về lỗi với thông báo phù hợp |  |  |  |  |
+| FR-01-DT-12 | Kiểm tra hủy đơn hàng ở trạng thái `confirmed` bởi `User` | current_state: confirmed<br>action: hủy<br>actor: User | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `confirmed`.<br>3. Thực hiện hành động `hủy` bởi `User`. | Trạng thái đơn hàng chuyển thành `canceled` |  |  |  |  |
+
+## III. KỊCH BẢN KIỂM THỬ THEO KỸ THUẬT BOUNDARY VALUE ANALYSIS (BVA)
+### I. DETAILED STEP-BY-STEP BOUNDARY ANALYSIS
+
+Để áp dụng kỹ thuật Boundary Value Analysis (BVA) cho trạng thái đơn hàng và các hành động liên quan, chúng ta cần xác định các điểm ranh giới nhạy cảm (Boundary) cho từng biến đầu vào có thể có giá trị số hoặc độ dài cụ thể. Tuy nhiên, trong trường hợp này, các biến đầu vào như trạng thái đơn hàng, hành động, và người thực hiện hành động đều là chuỗi và có giá trị cố định, không có độ dài hoặc giá trị số cụ thể cần kiểm tra.
+
+Tuy nhiên, chúng ta có thể áp dụng BVA cho các biến có thể có giá trị biên như số lượng hành động có thể thực hiện, số lượng trạng thái đơn hàng, v.v. Nhưng trong trường hợp này, các giá trị này đều được định nghĩa rõ ràng và không có độ dài hoặc giá trị số cần kiểm tra.
+
+Chúng ta sẽ tập trung vào việc kiểm tra các quy tắc nghiệp vụ và logic ngầm quan trọng đã được định nghĩa. Mỗi quy tắc sẽ được kiểm tra với các trường hợp biên khác nhau để đảm bảo rằng hệ thống hoạt động đúng như mong đợi.
+
+### II. BOUNDARY TEST CASES TABLE
+
+Dưới đây là các test case được thiết kế để kiểm tra các quy tắc nghiệp vụ và logic ngầm quan trọng:
+
+| Test Case ID | Description | Input Data | Test Steps | Expected Result | Actual Result | Status | Tested By | Date Tested |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| FR-01-BVA-01 | Kiểm tra chuyển đổi trạng thái đơn hàng từ `pending` sang `confirmed` | Trạng thái hiện tại: `pending`<br>Hành động: `xác nhận`<br>Người thực hiện hành động: `Admin` | 1. Tạo đơn hàng mới với trạng thái `pending`.<br>2. Thực hiện hành động `xác nhận` với người thực hiện hành động là `Admin`.<br>3. Kiểm tra trạng thái đơn hàng sau khi thực hiện hành động. | Trạng thái đơn hàng được chuyển đổi thành `confirmed`. |  |  |  |  |
+| FR-01-BVA-02 | Kiểm tra chuyển đổi trạng thái đơn hàng từ `confirmed` sang `shipping` | Trạng thái hiện tại: `confirmed`<br>Hành động: `giao hàng`<br>Người thực hiện hành động: `Admin` | 1. Tạo đơn hàng mới với trạng thái `confirmed`.<br>2. Thực hiện hành động `giao hàng` với người thực hiện hành động là `Admin`.<br>3. Kiểm tra trạng thái đơn hàng sau khi thực hiện hành động. | Trạng thái đơn hàng được chuyển đổi thành `shipping`. |  |  |  |  |
+| FR-01-BVA-03 | Kiểm tra chuyển đổi trạng thái đơn hàng từ `shipping` sang `delivered` | Trạng thái hiện tại: `shipping`<br>Hành động: `hoàn tất`<br>Người thực hiện hành động: `Admin` | 1. Tạo đơn hàng mới với trạng thái `shipping`.<br>2. Thực hiện hành động `hoàn tất` với người thực hiện hành động là `Admin`.<br>3. Kiểm tra trạng thái đơn hàng sau khi thực hiện hành động. | Trạng thái đơn hàng được chuyển đổi thành `delivered`. |  |  |  |  |
+| FR-01-BVA-04 | Kiểm tra hủy đơn hàng ở trạng thái `pending` | Trạng thái hiện tại: `pending`<br>Hành động: `hủy`<br>Người thực hiện hành động: `User` | 1. Tạo đơn hàng mới với trạng thái `pending`.<br>2. Thực hiện hành động `hủy` với người thực hiện hành động là `User`.<br>3. Kiểm tra trạng thái đơn hàng sau khi thực hiện hành động. | Trạng thái đơn hàng được chuyển đổi thành `canceled`. |  |  |  |  |
+| FR-01-BVA-05 | Kiểm tra hủy đơn hàng ở trạng thái `confirmed` | Trạng thái hiện tại: `confirmed`<br>Hành động: `hủy`<br>Người thực hiện hành động: `Admin` | 1. Tạo đơn hàng mới với trạng thái `confirmed`.<br>2. Thực hiện hành động `hủy` với người thực hiện hành động là `Admin`.<br>3. Kiểm tra trạng thái đơn hàng sau khi thực hiện hành động. | Trạng thái đơn hàng được chuyển đổi thành `canceled`. |  |  |  |  |
+| FR-01-BVA-06 | Kiểm tra chuyển đổi trạng thái đơn hàng không hợp lệ | Trạng thái hiện tại: `delivered`<br>Hành động: `giao hàng`<br>Người thực hiện hành động: `Admin` | 1. Tạo đơn hàng mới với trạng thái `delivered`.<br>2. Thực hiện hành động `giao hàng` với người thực hiện hành động là `Admin`.<br>3. Kiểm tra trạng thái đơn hàng sau khi thực hiện hành động. | Hệ thống trả về lỗi với thông báo phù hợp. |  |  |  |  |
+| FR-01-BVA-07 | Kiểm tra chuyển đổi trạng thái đơn hàng không hợp lệ | Trạng thái hiện tại: `canceled`<br>Hành động: `xác nhận`<br>Người thực hiện hành động: `Admin` | 1. Tạo đơn hàng mới với trạng thái `canceled`.<br>2. Thực hiện hành động `xác nhận` với người thực hiện hành động là `Admin`.<br>3. Kiểm tra trạng thái đơn hàng sau khi thực hiện hành động. | Hệ thống trả về lỗi với thông báo phù hợp. |  |  |  |  |
+| FR-01-BVA-08 | Kiểm tra chuyển đổi trạng thái đơn hàng không hợp lệ | Trạng thái hiện tại: `pending`<br>Hành động: `hoàn tất`<br>Người thực hiện hành động: `Admin` | 1. Tạo đơn hàng mới với trạng thái `pending`.<br>2. Thực hiện hành động `hoàn tất` với người thực hiện hành động là `Admin`.<br>3. Kiểm tra trạng thái đơn hàng sau khi thực hiện hành động. | Hệ thống trả về lỗi với thông báo phù hợp. |  |  |  |  |
+| FR-01-BVA-09 | Kiểm tra chuyển đổi trạng thái đơn hàng không hợp lệ | Trạng thái hiện tại: `confirmed`<br>Hành động: `hủy`<br>Người thực hiện hành động: `User` | 1. Tạo đơn hàng mới với trạng thái `confirmed`.<br>2. Thực hiện hành động `hủy` với người thực hiện hành động là `User`.<br>3. Kiểm tra trạng thái đơn hàng sau khi thực hiện hành động. | Trạng thái đơn hàng được chuyển đổi thành `canceled`. |  |  |  |  |
+
+Lưu ý rằng các test case trên chỉ là một số ví dụ và có thể cần thêm các test case khác để đảm bảo rằng hệ thống hoạt động đúng như mong đợi.
+

@@ -72,3 +72,58 @@
    - Email không hợp lệ
    - Email đã tồn tại
    - Kiểm tra biên độ dài Họ Tên — một ràng buộc AI tự nghĩ ra, không có trong spec
+
+# FR-10: Trạng thái Đơn hàng (Order State Machine)
+## Domain Testing
+### Giải thích
+Để thiết kế bộ kịch bản kiểm thử cho trạng thái đơn hàng, chúng ta cần phân tích từng biến đầu vào và xác định các miền tương đương hợp lệ và không hợp lệ.
+
+1. **Trạng thái hiện tại của đơn hàng (current_state)**: 
+   - Miền hợp lệ: `pending`, `confirmed`, `shipping`, `delivered`, `canceled`
+   - Miền không hợp lệ: bất kỳ giá trị nào khác ngoài 5 giá trị trên
+
+2. **Hành động được thực hiện (action)**: 
+   - Miền hợp lệ: `xác nhận`, `giao hàng`, `hoàn tất`, `hủy`
+   - Miền không hợp lệ: bất kỳ giá trị nào khác ngoài 4 giá trị trên
+
+3. **Người thực hiện hành động (actor)**: 
+   - Miền hợp lệ: `Admin`, `User`
+   - Miền không hợp lệ: bất kỳ giá trị nào khác ngoài 2 giá trị trên
+
+Áp dụng quy tắc "Phủ định từng thành phần" (Single Negative Fault Isolation) cho từng trường dữ liệu có chứa nhiều ràng buộc phức tạp lồng nhau, chúng ta sẽ kiểm tra từng thành phần một cách độc lập.
+
+### Bảng Test Cases
+| Test Case ID | Description | Input Data | Test Steps | Expected Result | Actual Result | Status | Tested By | Date Tested |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| FR-10-DT-01 | Kiểm tra chuyển đổi trạng thái từ `pending` sang `confirmed` bởi `Admin` | current_state: pending<br>action: xác nhận<br>actor: Admin | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `pending`.<br>3. Thực hiện hành động `xác nhận` bởi `Admin`. | Trạng thái đơn hàng chuyển thành `confirmed` |  |  |  |  |
+| FR-10-DT-02 | Kiểm tra chuyển đổi trạng thái từ `confirmed` sang `shipping` bởi `Admin` | current_state: confirmed<br>action: giao hàng<br>actor: Admin | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `confirmed`.<br>3. Thực hiện hành động `giao hàng` bởi `Admin`. | Trạng thái đơn hàng chuyển thành `shipping` |  |  |  |  |
+| FR-10-DT-03 | Kiểm tra chuyển đổi trạng thái từ `shipping` sang `delivered` bởi `Admin` | current_state: shipping<br>action: hoàn tất<br>actor: Admin | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `shipping`.<br>3. Thực hiện hành động `hoàn tất` bởi `Admin`. | Trạng thái đơn hàng chuyển thành `delivered` |  |  |  |  |
+| FR-10-DT-04 | Kiểm tra hủy đơn hàng ở trạng thái `pending` bởi `User` | current_state: pending<br>action: hủy<br>actor: User | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `pending`.<br>3. Thực hiện hành động `hủy` bởi `User`. | Trạng thái đơn hàng chuyển thành `canceled` |  |  |  |  |
+| FR-10-DT-05 | Kiểm tra chuyển đổi trạng thái không hợp lệ từ `delivered` sang `confirmed` | current_state: delivered<br>action: xác nhận<br>actor: Admin | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `delivered`.<br>3. Thực hiện hành động `xác nhận` bởi `Admin`. | Trả về lỗi với thông báo phù hợp |  |  |  |  |
+| FR-10-DT-06 | Kiểm tra chuyển đổi trạng thái không hợp lệ từ `canceled` sang `shipping` | current_state: canceled<br>action: giao hàng<br>actor: Admin | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `canceled`.<br>3. Thực hiện hành động `giao hàng` bởi `Admin`. | Trả về lỗi với thông báo phù hợp |  |  |  |  |
+| FR-10-DT-07 | Kiểm tra hành động không hợp lệ bởi `User` | current_state: pending<br>action: xác nhận<br>actor: User | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `pending`.<br>3. Thực hiện hành động `xác nhận` bởi `User`. | Trả về lỗi với thông báo phù hợp |  |  |  |  |
+| FR-10-DT-08 | Kiểm tra hủy đơn hàng ở trạng thái `shipping` bởi `Admin` | current_state: shipping<br>action: hủy<br>actor: Admin | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `shipping`.<br>3. Thực hiện hành động `hủy` bởi `Admin`. | Trạng thái đơn hàng chuyển thành `canceled` |  |  |  |  |
+| FR-10-DT-09 | Kiểm tra chuyển đổi trạng thái không hợp lệ từ `pending` sang `delivered` | current_state: pending<br>action: hoàn tất<br>actor: Admin | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `pending`.<br>3. Thực hiện hành động `hoàn tất` bởi `Admin`. | Trả về lỗi với thông báo phù hợp |  |  |  |  |
+| FR-10-DT-10 | Kiểm tra chuyển đổi trạng thái từ `confirmed` sang `delivered` | current_state: confirmed<br>action: hoàn tất<br>actor: Admin | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `confirmed`.<br>3. Thực hiện hành động `hoàn tất` bởi `Admin`. | Trả về lỗi với thông báo phù hợp |  |  |  |  |
+| FR-10-DT-11 | Kiểm tra hủy đơn hàng ở trạng thái `confirmed` bởi `User` | current_state: confirmed<br>action: hủy<br>actor: User | 1. Truy cập trang quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `confirmed`.<br>3. Thực hiện hành động `hủy` bởi `User`. | Trạng thái đơn hàng chuyển thành `canceled` |  |  |  |  |
+
+## Boundary Value Analysis
+### Giải thích
+Để áp dụng kỹ thuật Boundary Value Analysis (BVA) cho trạng thái đơn hàng và các hành động liên quan, chúng ta cần xác định các điểm ranh giới nhạy cảm (Boundary) cho từng biến đầu vào có thể có giá trị số hoặc độ dài cụ thể. Tuy nhiên, trong trường hợp này, các biến đầu vào như trạng thái đơn hàng, hành động, và người thực hiện hành động đều là chuỗi và có giá trị cố định, không có độ dài hoặc giá trị số cụ thể cần kiểm tra.
+
+Tuy nhiên, chúng ta có thể áp dụng BVA cho các biến có thể có giá trị biên như số lượng hành động có thể thực hiện, số lượng trạng thái đơn hàng, v.v. Nhưng trong trường hợp này, các giá trị này đều được định nghĩa rõ ràng và không có độ dài hoặc giá trị số cần kiểm tra.
+
+Chúng ta sẽ tập trung vào việc kiểm tra các quy tắc nghiệp vụ và logic ngầm quan trọng đã được định nghĩa. Mỗi quy tắc sẽ được kiểm tra với các trường hợp biên khác nhau để đảm bảo rằng hệ thống hoạt động đúng như mong đợi.
+
+### Bảng Test Cases
+Kỹ thuật Boundary Value Analysis không áp dụng được cho tính năng FR-10 vì toàn bộ biến đầu vào (current_state, action, actor) đều là tập giá trị enum cố định, không có ranh giới số học hay độ dài chuỗi nào cần kiểm tra tại biên. Các kịch bản chuyển đổi trạng thái hợp lệ/không hợp lệ đã được cover đầy đủ bởi Domain Testing ở trên
+
+## AI gap analysis
+1. Domain Testing — Test cases trùng lặp logic
+- Phần giải trình Domain Testing bám spec tốt, phân tích đủ 3 biến current_state, action, actor và áp dụng đúng nguyên tắc Single Negative Fault Isolation. Tuy nhiên trong bảng test cases có 2 cặp trùng lặp logic: FR-01-DT-07 (pending + xác nhận + User → Lỗi) trùng hoàn toàn với
+FR-01-DT-09 đã được loại bỏ. Bộ còn lại 11 cases đủ coverage.
+
+2. BVA — Toàn bộ test cases bị đặt sai kỹ thuật
+- Phần giải trình BVA đã tự nhận thức đúng vấn đề — AI thừa nhận rằng các biến đầu vào của tính năng này đều là chuỗi enum cố định, không có ranh giới số học nào để đo. Đây là điểm hiếm gặp khi AI tự đánh giá đúng giới hạn của mình.
+- Tuy nhiên phần kết luận lại mâu thuẫn — thay vì dừng lại, AI vẫn cố sinh ra 9 test cases cho BVA bằng cách kiểm tra các chuyển đổi trạng thái hợp lệ/không hợp lệ. Đây là Domain Testing thuần túy, không liên quan gì đến BVA.
+- Về bản chất, tính năng Order State Machine không có thuộc tính nào có đơn vị đo — không có độ dài chuỗi, không có giá trị số, không có ngưỡng thời gian — nên BVA không áp dụng được cho feature này. Đây không phải lỗi của AI mà là đặc thù của bài toán.
