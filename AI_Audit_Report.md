@@ -890,3 +890,326 @@ Dưới đây là các test case được thiết kế để kiểm tra các quy
 
 Lưu ý rằng các test case trên chỉ là một số ví dụ và có thể cần thêm các test case khác để đảm bảo rằng hệ thống hoạt động đúng như mong đợi.
 
+
+---
+
+## Entry 13
+
+### AI tool name
+* llama-3.3-70b-versatile (via Groq API — 4-Agent Pipeline with Decoupled Skills)
+
+### Date and time
+* 2026-06-12 16:25:22
+
+### Prompt
+#### [Input Feature Specification]
+```text
+FR-01: Đăng ký tài khoản
+- Người dùng phải cung cấp: Họ Tên, Email, Mật khẩu.
+- Email phải có định dạng hợp lệ (user@domain.com) và là duy nhất trong hệ thống.
+- Yêu cầu mật khẩu mạnh: Tối thiểu 8 ký tự, có ít nhất 1 chữ hoa, 1 chữ thường, 1 chữ số và 1 ký tự đặc biệt (@, $, !, %, *, ?, &).
+- Phải có trường Xác nhận mật khẩu — hệ thống từ chối nếu hai trường không khớp.
+- Sau khi đăng ký thành công, người dùng được chuyển tới trang Đăng nhập.
+```
+
+#### [Agent 1 System Prompt — Spec Analyst]
+```text
+Bạn là một Business Analyst (BA) chuyên phân tích đặc tả phần mềm.
+Nhiệm vụ của bạn là phân tích tài liệu spec được cung cấp và bóc tách thành các mục rõ ràng:
+
+1. Danh sách các biến đầu vào (Input variables).
+2. Kiểu dữ liệu và Ràng buộc (Constraints/Datatypes) chi tiết của từng biến (Ví dụ: độ dài tối thiểu/tối đa, tập ký tự cho phép).
+3. Các quy tắc nghiệp vụ (Business Rules) và logic ngầm quan trọng ảnh hưởng trực tiếp đến kết quả hệ thống.
+   Trả lời súc tích, cấu trúc Markdown rõ ràng bằng tiếng Việt.
+```
+
+#### [Agent 2 System Prompt — Domain Testing]
+```text
+Bạn là ISTQB Senior QA Engineer chuyên sâu về kỹ thuật Equivalence Partitioning (Phân hoạch miền tương đương) và Combinatorial Testing (Kiểm thử tổ hợp).
+Dựa trên kết quả phân tích đặc tả từ BA, nhiệm vụ của bạn là thiết kế một bộ kịch bản kiểm thử có độ bao phủ tối đa (Maximum Coverage).
+
+Nhiệm vụ cụ thể:
+1. Provide a detailed, step-by-step explanation of how you applied the technique: Trình bày chi tiết bằng tiếng Việt cách bạn tư duy, bóc tách và xác định rõ ràng tất cả các miền tương đương Hợp lệ (Valid Partitions) và Không hợp lệ (Invalid Partitions) cho TỪNG biến đầu vào. 
+2. Xuất bảng Test Cases dạng Markdown bắt buộc phải chứa các giá trị kiểm thử cụ thể (Concrete Test Data). KHÔNG ghi định tính chung chung.
+3. Bảng kịch bản phải tuân thủ chính xác cấu trúc cột sau:
+| Test Case ID | Description | Input Data | Test Steps | Expected Result | Actual Result | Status | Tested By | Date Tested |
+
+QUY TẮC BẮT BUỘC ĐỂ KHÔNG BỎ SÓT KỊCH BẢN VÀ BƯỚC THỰC HIỆN (ANTI-LAZINESS RULES):
+- Số lượng kịch bản tối thiểu: Bắt buộc phải sinh ra ít nhất từ 8 đến 12 test cases trở lên cho một tính năng form chuẩn.
+- Chiến lược Phân rã lỗi (Constraint Decomposition Strategy): Đối với bất kỳ trường dữ liệu nào có chứa nhiều ràng buộc phức tạp lồng nhau, phải áp dụng tư duy "Phủ định từng thành phần" (Single Negative Fault Isolation).
+- QUY TẮC CỘT TEST STEPS (BẮT BUỘC): KHÔNG ĐƯỢC ghi chung chung kiểu "Nhập thông tin form". Bạn phải viết chi tiết hành vi tương tác với giao diện theo từng bước, chỉ rõ trường nào nhận giá trị nào từ cột Input Data và phân tách bằng thẻ <br>. 
+  * Ví dụ chuẩn định dạng: 1. Truy cập trang đăng ký.<br>2. Điền trường Họ Tên là "[Giá trị họ tên thực tế]", điền trường Email là "[Giá trị email thực tế]", điền trường Mật khẩu là "[Giá trị mật khẩu thực tế]", điền trường Xác nhận mật khẩu là "[Giá trị xác nhận mật khẩu thực tế]".<br>3. Nhấn nút "Đăng ký".
+- Trong ô [Input Data]: BẮT BUỘC cung cấp Full Data Payload. Mỗi trường viết trên một dòng, cách nhau bằng thẻ <br>.
+- Kịch bản ID bắt đầu bằng format: FR-XX-DT-01, FR-XX-DT-02...
+- Tách biệt rõ ràng phần giải trình lý thuyết và bảng test cases.
+
+BẮT BUỘC ĐỊNH DẠNG ĐẦU RA THEO CẤU TRÚC HEADING SAU:
+### I. DETAILED STEP-BY-STEP DOMAIN ANALYSIS
+### II. DOMAIN TEST CASES TABLE
+```
+
+#### [Agent 3 System Prompt — BVA]
+```text
+Bạn là ISTQB Senior QA Engineer chuyên sâu về kỹ thuật Boundary Value Analysis (BVA).
+Hãy lưu ý: BVA chỉ áp dụng cho các biến có ranh giới số lượng hoặc độ dài số học (Ví dụ: Độ dài chuỗi, Giá trị số). KHÔNG áp dụng BVA cho các biến định tính logic như định dạng cấu trúc Email.
+
+Nhiệm vụ của bạn bao gồm:
+1. Provide a detailed, step-by-step explanation of how you applied the technique: Trình bày chi tiết từng bước bằng tiếng Việt cách bạn tư duy, phân tích toán học để xác định rõ các điểm ranh giới nhạy cảm: Boundary, Boundary - 1, Boundary + 1 (cho cả biên dưới MIN và biên trên MAX nếu có quy định rõ hoặc theo giới hạn hệ thống). Hãy giải thích lý do chuyên môn tại sao các điểm lân cận biên này lại có nguy cơ phát sinh lỗi cao.
+2. Xuất bảng Test Cases dạng Markdown. Toàn bộ kịch bản BVA BẮT BUỘC phải sử dụng dữ liệu kiểm thử cụ thể, chính xác đến từng ký tự (Concrete Test Data). KHÔNG ghi chung chung.
+3. Bảng kịch bản phải tuân thủ chính xác cấu trúc cột sau:
+| Test Case ID | Description | Input Data | Test Steps | Expected Result | Actual Result | Status | Tested By | Date Tested |
+
+QUY TẮC BẮT BUỘC ĐỂ KHÔNG BỎ SÓT KỊCH BẢN VÀ BƯỚC THỰC HIỆN (ANTI-LAZINESS RULES):
+- Số lượng kịch bản tối thiểu: Bắt buộc phải sinh ra ít nhất từ 6 đến 9 test cases biên trở lên.
+- Đa biên (Multi-variable Boundaries): Phải tự động quét qua và xác định tất cả các biến có tính chất biên số học hoặc độ dài xuất hiện trong đặc tả. Bạn phải thực hiện tìm các điểm nhạy cảm Boundary-1, Boundary, Boundary+1 cho TỪNG trường hợp đó để tránh bỏ sót.
+- Quy tắc cô lập biên (Variable Isolation): Khi kiểm thử biên của một biến, toàn bộ các trường dữ liệu bắt buộc khác trên form BẮT BUỘC phải được điền đầy đủ bằng các giá trị HỢP LỆ nhằm cô lập hành vi lỗi.
+- QUY TẮC CỘT TEST STEPS (BẮT BUỘC): KHÔNG ĐƯỢC ghi chung chung kiểu "Submit form". Bạn phải ghi chi tiết từng thao tác nhập liệu thực tế tương ứng với dữ liệu ở cột Input Data và ngắt dòng bằng thẻ <br>.
+  * Ví dụ chuẩn định dạng: 1. Truy cập trang đăng ký.<br>2. Nhập chuỗi "[Giá trị họ tên]" vào trường Họ Tên, nhập "[Giá trị email]" vào trường Email, nhập chuỗi có độ dài biên "[Giá trị mật khẩu]" vào trường Mật khẩu, nhập "[Giá trị xác nhận mật khẩu]" vào trường Xác nhận mật khẩu.<br>3. Click chuột vào nút "Đăng ký" để gửi dữ liệu hệ thống.
+- Trong ô [Input Data]: BẮT BUỘC cung cấp Full Data Payload. Mỗi trường nằm trên một dòng riêng biệt, cách dòng bằng thẻ <br>. Hãy ghi kèm độ dài hoặc giá trị số thực tế bên cạnh biến đang xét biên để chứng minh tính chính xác toán học biên.
+- Kịch bản ID bắt đầu bằng format: FR-XX-BVA-01, FR-XX-BVA-02...
+
+BẮT BUỘC ĐỊNH DẠNG ĐẦU RA THEO CẤU TRÚC HEADING SAU:
+### I. DETAILED STEP-BY-STEP BOUNDARY ANALYSIS
+### II. BOUNDARY TEST CASES TABLE
+```
+
+#### [Agent 4 System Prompt — Report Writer]
+```text
+Bạn là Technical Writer chuyên nghiệp, đóng vai trò là một bộ lắp ráp cấu trúc tài liệu kiểm thử phần mềm chất lượng cao. 
+Nhiệm vụ tối cao của bạn là tiếp nhận kết quả thô từ các Agent trước và ghép nối chúng thành một file báo cáo Markdown duy nhất theo đúng cấu trúc hệ thống, TUYỆT ĐỐI KHÔNG ĐƯỢC TỰ Ý BIÊN TẬP LẠI NỘI DUNG CHUYÊN MÔN.
+
+QUY TẮC CƯỠNG CHẾ GIỮ NGUYÊN VẸN (STRICT NO-OMISSION RULES):
+1. GIỮ NGUYÊN 100% NỘI DUNG: Không được phép tóm tắt, rút gọn, lược bỏ hoặc làm mờ bất kỳ một từ, một dòng giải trình lý thuyết (Detailed Analysis Step-by-Step) nào của Agent 2 và Agent 3.
+2. KHÔNG ĐƯỢC THU GỌN BẢNG TEST CASES: Bản danh sách Test Cases của cả hai kỹ thuật nhả ra có bao nhiêu dòng (ví dụ: từ FR-01-DT-01 đến FR-01-DT-12 và FR-01-BVA-01 đến FR-01-BVA-09) thì phải sao chép chính xác toàn bộ bấy nhiêu dòng vào báo cáo cuối cùng. Nghiêm cấm hành vi sử dụng dấu ba chấm (...) hoặc gộp các ca test lại làm một.
+3. BẢO TOÀN THẺ ĐỊNH DẠNG <br>: Giữ nguyên vẹn toàn bộ các thẻ <br> dùng để ngắt dòng trong tất cả các ô [Input Data] và [Test Steps]. Không được xóa thẻ hoặc tự ý chuyển đổi chúng thành dấu xuống dòng thông thường để tránh làm vỡ kết cấu hiển thị của bảng Markdown.
+
+BẮT BUỘC TỔ CHỨC CẤU TRÚC FILE ĐẦU RA THEO ĐÚNG KHUNG SAU:
+
+# BÁO CÁO KẾT QUẢ THIẾT KẾ KỊCH BẢN KIỂM THỬ
+
+## I. KỊCH BẢN KIỂM THỬ THEO KỸ THUẬT DOMAIN TESTING
+(Chèn nguyên văn toàn bộ phần Giải trình tư duy "DETAILED STEP-BY-STEP DOMAIN ANALYSIS" và Bảng "DOMAIN TEST CASES TABLE" của Agent 2 tại đây. Tuyệt đối giữ nguyên vẹn danh sách 12 ca test và các thẻ <br>).
+
+## II. KỊCH BẢN KIỂM THỬ THEO KỸ THUẬT BOUNDARY VALUE ANALYSIS (BVA)
+(Chèn nguyên văn toàn bộ phần Giải trình tư duy "DETAILED STEP-BY-STEP BOUNDARY ANALYSIS" và Bảng "BOUNDARY TEST CASES TABLE" của Agent 3 tại đây. Tuyệt đối giữ nguyên vẹn danh sách 9 ca test và các thẻ <br>).
+```
+
+### The AI output
+
+**[Agent 1 — Spec Analysis]**
+### Phân tích Spec Đăng ký tài khoản
+
+#### 1. Danh sách các biến đầu vào (Input variables)
+- Họ Tên
+- Email
+- Mật khẩu
+- Xác nhận mật khẩu
+
+#### 2. Kiểu dữ liệu và Ràng buộc (Constraints/Datatypes)
+- **Họ Tên**:
+  - Kiểu dữ liệu: Chuỗi (String)
+  - Ràng buộc: Không quy định rõ ràng về độ dài tối thiểu/tối đa, nhưng thường nên có giới hạn (ví dụ: từ 2 đến 50 ký tự)
+- **Email**:
+  - Kiểu dữ liệu: Chuỗi (String)
+  - Ràng buộc:
+    - Định dạng hợp lệ (user@domain.com)
+    - Phải là duy nhất trong hệ thống
+- **Mật khẩu**:
+  - Kiểu dữ liệu: Chuỗi (String)
+  - Ràng buộc:
+    - Tối thiểu 8 ký tự
+    - Có ít nhất 1 chữ hoa
+    - Có ít nhất 1 chữ thường
+    - Có ít nhất 1 chữ số
+    - Có ít nhất 1 ký tự đặc biệt (@, $, !, %, *, ?, &)
+- **Xác nhận mật khẩu**:
+  - Kiểu dữ liệu: Chuỗi (String)
+  - Ràng buộc: Phải khớp với trường Mật khẩu
+
+#### 3. Các quy tắc nghiệp vụ (Business Rules) và logic ngầm
+- Hệ thống kiểm tra tính hợp lệ của Email và mật khẩu trước khi cho phép đăng ký.
+- Hệ thống kiểm tra sự duy nhất của Email trong cơ sở dữ liệu trước khi cho phép đăng ký.
+- Nếu Xác nhận mật khẩu không khớp với Mật khẩu, hệ thống từ chối đăng ký.
+- Sau khi đăng ký thành công, người dùng sẽ được chuyển tới trang Đăng nhập.
+
+**[Agent 2 — Domain Testing]**
+### I. DETAILED STEP-BY-STEP DOMAIN ANALYSIS
+
+Để thiết kế bộ kịch bản kiểm thử cho tính năng đăng ký tài khoản, chúng ta cần phân tích kỹ lưỡng từng biến đầu vào và ràng buộc của chúng. Dưới đây là quá trình tư duy và bóc tách từng biến:
+
+1. **Họ Tên**:
+   - Miền hợp lệ (Valid Partitions): Chuỗi từ 2 đến 50 ký tự.
+   - Miền không hợp lệ (Invalid Partitions): Chuỗi dưới 2 ký tự, chuỗi trên 50 ký tự, chuỗi rỗng.
+   - Kiểm thử cần bao gồm các trường hợp biên (boundary values) như 1 ký tự, 2 ký tự, 50 ký tự, và 51 ký tự.
+
+2. **Email**:
+   - Miền hợp lệ: Chuỗi có định dạng hợp lệ (user@domain.com) và duy nhất trong hệ thống.
+   - Miền không hợp lệ: Chuỗi không có định dạng hợp lệ, chuỗi đã tồn tại trong hệ thống.
+   - Kiểm thử cần bao gồm các trường hợp như email hợp lệ, email không hợp lệ (ví dụ: thiếu @, không có domain), và email đã tồn tại.
+
+3. **Mật khẩu**:
+   - Miền hợp lệ: Chuỗi từ 8 ký tự trở lên, có ít nhất 1 chữ hoa, 1 chữ thường, 1 chữ số, và 1 ký tự đặc biệt.
+   - Miền không hợp lệ: Chuỗi dưới 8 ký tự, không có chữ hoa, không có chữ thường, không có chữ số, không có ký tự đặc biệt.
+   - Kiểm thử cần bao gồm các trường hợp như mật khẩu hợp lệ, mật khẩu không hợp lệ (ví dụ: dưới 8 ký tự, không có chữ hoa), và các trường hợp biên.
+
+4. **Xác nhận mật khẩu**:
+   - Miền hợp lệ: Chuỗi khớp với trường Mật khẩu.
+   - Miền không hợp lệ: Chuỗi không khớp với trường Mật khẩu.
+   - Kiểm thử cần bao gồm các trường hợp như xác nhận mật khẩu khớp và không khớp với mật khẩu.
+
+### II. DOMAIN TEST CASES TABLE
+
+| Test Case ID | Description | Input Data | Test Steps | Expected Result | Actual Result | Status | Tested By | Date Tested |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| FR-01-DT-01 | Kiểm thử đăng ký thành công | Họ Tên: Nguyễn Văn A<br>Email: test@example.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "test@example.com", Mật khẩu là "P@ssw0rd", Xác nhận mật khẩu là "P@ssw0rd".<br>3. Nhấn nút "Đăng ký". | Đăng ký thành công, chuyển tới trang Đăng nhập. |  |  |  |  |
+| FR-01-DT-02 | Kiểm thử họ tên dưới 2 ký tự | Họ Tên: A<br>Email: test2@example.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "A", Email là "test2@example.com", Mật khẩu là "P@ssw0rd", Xác nhận mật khẩu là "P@ssw0rd".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về họ tên. |  |  |  |  |
+| FR-01-DT-03 | Kiểm thử họ tên trên 50 ký tự | Họ Tên: Nguyễn Văn ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>Email: test3@example.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn ABCDEFGHIJKLMNOPQRSTUVWXYZ", Email là "test3@example.com", Mật khẩu là "P@ssw0rd", Xác nhận mật khẩu là "P@ssw0rd".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về họ tên. |  |  |  |  |
+| FR-01-DT-04 | Kiểm thử email không hợp lệ | Họ Tên: Nguyễn Văn A<br>Email: test@example<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "test@example", Mật khẩu là "P@ssw0rd", Xác nhận mật khẩu là "P@ssw0rd".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về email. |  |  |  |  |
+| FR-01-DT-05 | Kiểm thử mật khẩu dưới 8 ký tự | Họ Tên: Nguyễn Văn A<br>Email: test5@example.com<br>Mật khẩu: P@ss<br>Xác nhận mật khẩu: P@ss | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "test5@example.com", Mật khẩu là "P@ss", Xác nhận mật khẩu là "P@ss".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về mật khẩu. |  |  |  |  |
+| FR-01-DT-06 | Kiểm thử xác nhận mật khẩu không khớp | Họ Tên: Nguyễn Văn A<br>Email: test6@example.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0r | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "test6@example.com", Mật khẩu là "P@ssw0rd", Xác nhận mật khẩu là "P@ssw0r".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về xác nhận mật khẩu. |  |  |  |  |
+| FR-01-DT-07 | Kiểm thử email đã tồn tại | Họ Tên: Nguyễn Văn A<br>Email: test@example.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "test@example.com", Mật khẩu là "P@ssw0rd", Xác nhận mật khẩu là "P@ssw0rd".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về email đã tồn tại. |  |  |  |  |
+| FR-01-DT-08 | Kiểm thử đăng ký với mật khẩu không có chữ hoa | Họ Tên: Nguyễn Văn A<br>Email: test8@example.com<br>Mật khẩu: p@ssw0rd<br>Xác nhận mật khẩu: p@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "test8@example.com", Mật khẩu là "p@ssw0rd", Xác nhận mật khẩu là "p@ssw0rd".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về mật khẩu. |  |  |  |  |
+| FR-01-DT-09 | Kiểm thử đăng ký với mật khẩu không có chữ thường | Họ Tên: Nguyễn Văn A<br>Email: test9@example.com<br>Mật khẩu: P@SSW0RD<br>Xác nhận mật khẩu: P@SSW0RD | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "test9@example.com", Mật khẩu là "P@SSW0RD", Xác nhận mật khẩu là "P@SSW0RD".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về mật khẩu. |  |  |  |  |
+| FR-01-DT-10 | Kiểm thử đăng ký với mật khẩu không có chữ số | Họ Tên: Nguyễn Văn A<br>Email: test10@example.com<br>Mật khẩu: P@ssword<br>Xác nhận mật khẩu: P@ssword | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "test10@example.com", Mật khẩu là "P@ssword", Xác nhận mật khẩu là "P@ssword".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về mật khẩu. |  |  |  |  |
+| FR-01-DT-11 | Kiểm thử đăng ký với mật khẩu không có ký tự đặc biệt | Họ Tên: Nguyễn Văn A<br>Email: test11@example.com<br>Mật khẩu: Password123<br>Xác nhận mật khẩu: Password123 | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "test11@example.com", Mật khẩu là "Password123", Xác nhận mật khẩu là "Password123".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về mật khẩu. |  |  |  |  |
+| FR-01-DT-12 | Kiểm thử đăng ký với tất cả các trường hợp hợp lệ | Họ Tên: Nguyễn Văn A<br>Email: test12@example.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "test12@example.com", Mật khẩu là "P@ssw0rd", Xác nhận mật khẩu là "P@ssw0rd".<br>3. Nhấn nút "Đăng ký". | Đăng ký thành công, chuyển tới trang Đăng nhập. |  |  |  |  |
+
+**[Agent 3 — BVA]**
+### I. DETAILED STEP-BY-STEP BOUNDARY ANALYSIS
+
+Để áp dụng kỹ thuật Boundary Value Analysis (BVA) cho quá trình đăng ký tài khoản, chúng ta cần tập trung vào các biến có ranh giới số lượng hoặc độ dài số học. Trong trường hợp này, chúng ta có thể áp dụng BVA cho các biến sau:
+
+- **Họ Tên**: Giả sử độ dài tối thiểu là 2 ký tự và tối đa là 50 ký tự.
+- **Mật khẩu**: Có độ dài tối thiểu là 8 ký tự.
+
+Các bước phân tích BVA như sau:
+
+1. Xác định ranh giới (Boundary) cho từng biến:
+   - **Họ Tên**:
+     - Boundary dưới (MIN): 2 ký tự
+     - Boundary trên (MAX): 50 ký tự
+   - **Mật khẩu**:
+     - Boundary dưới (MIN): 8 ký tự
+
+2. Xác định các điểm ranh giới nhạy cảm:
+   - **Họ Tên**:
+     - Boundary - 1: 1 ký tự (dưới giới hạn tối thiểu)
+     - Boundary: 2 ký tự (giới hạn tối thiểu)
+     - Boundary + 1: 3 ký tự (trên giới hạn tối thiểu)
+     - Boundary - 1 (MAX): 49 ký tự (dưới giới hạn tối đa)
+     - Boundary (MAX): 50 ký tự (giới hạn tối đa)
+     - Boundary + 1 (MAX): 51 ký tự (trên giới hạn tối đa)
+   - **Mật khẩu**:
+     - Boundary - 1: 7 ký tự (dưới giới hạn tối thiểu)
+     - Boundary: 8 ký tự (giới hạn tối thiểu)
+     - Boundary + 1: 9 ký tự (trên giới hạn tối thiểu)
+
+Lý do các điểm lân cận biên này lại có nguy cơ phát sinh lỗi cao là vì chúng nằm ở ranh giới của các quy định về độ dài hoặc số lượng, và hệ thống có thể xử lý không đúng hoặc không đầy đủ ở những điểm này, dẫn đến lỗi.
+
+### II. BOUNDARY TEST CASES TABLE
+
+| Test Case ID | Description | Input Data | Test Steps | Expected Result | Actual Result | Status | Tested By | Date Tested |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| FR-01-BVA-01 | Kiểm tra họ tên dưới giới hạn tối thiểu | Họ Tên: a<br>Email: user@example.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Nhập chuỗi "a" vào trường Họ Tên, nhập "user@example.com" vào trường Email, nhập "P@ssw0rd" vào trường Mật khẩu, nhập "P@ssw0rd" vào trường Xác nhận mật khẩu.<br>3. Click chuột vào nút "Đăng ký" để gửi dữ liệu hệ thống. | Hệ thống từ chối đăng ký do họ tên quá ngắn. |  |  |  |  |
+| FR-01-BVA-02 | Kiểm tra họ tên tại giới hạn tối thiểu | Họ Tên: ab<br>Email: user@example.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Nhập chuỗi "ab" vào trường Họ Tên, nhập "user@example.com" vào trường Email, nhập "P@ssw0rd" vào trường Mật khẩu, nhập "P@ssw0rd" vào trường Xác nhận mật khẩu.<br>3. Click chuột vào nút "Đăng ký" để gửi dữ liệu hệ thống. | Hệ thống cho phép đăng ký. |  |  |  |  |
+| FR-01-BVA-03 | Kiểm tra họ tên trên giới hạn tối thiểu | Họ Tên: abc<br>Email: user@example.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Nhập chuỗi "abc" vào trường Họ Tên, nhập "user@example.com" vào trường Email, nhập "P@ssw0rd" vào trường Mật khẩu, nhập "P@ssw0rd" vào trường Xác nhận mật khẩu.<br>3. Click chuột vào nút "Đăng ký" để gửi dữ liệu hệ thống. | Hệ thống cho phép đăng ký. |  |  |  |  |
+| FR-01-BVA-04 | Kiểm tra họ tên dưới giới hạn tối đa | Họ Tên: abcdefghijklmnopqrstuvwx<br>Email: user@example.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Nhập chuỗi "abcdefghijklmnopqrstuvwx" vào trường Họ Tên, nhập "user@example.com" vào trường Email, nhập "P@ssw0rd" vào trường Mật khẩu, nhập "P@ssw0rd" vào trường Xác nhận mật khẩu.<br>3. Click chuột vào nút "Đăng ký" để gửi dữ liệu hệ thống. | Hệ thống cho phép đăng ký. |  |  |  |  |
+| FR-01-BVA-05 | Kiểm tra họ tên tại giới hạn tối đa | Họ Tên: abcdefghijklmnopqrstuvwxy<br>Email: user@example.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Nhập chuỗi "abcdefghijklmnopqrstuvwxyz" vào trường Họ Tên, nhập "user@example.com" vào trường Email, nhập "P@ssw0rd" vào trường Mật khẩu, nhập "P@ssw0rd" vào trường Xác nhận mật khẩu.<br>3. Click chuột vào nút "Đăng ký" để gửi dữ liệu hệ thống. | Hệ thống cho phép đăng ký. |  |  |  |  |
+| FR-01-BVA-06 | Kiểm tra họ tên trên giới hạn tối đa | Họ Tên: abcdefghijklmnopqrstuvwxyz1<br>Email: user@example.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Nhập chuỗi "abcdefghijklmnopqrstuvwxyz1" vào trường Họ Tên, nhập "user@example.com" vào trường Email, nhập "P@ssw0rd" vào trường Mật khẩu, nhập "P@ssw0rd" vào trường Xác nhận mật khẩu.<br>3. Click chuột vào nút "Đăng ký" để gửi dữ liệu hệ thống. | Hệ thống từ chối đăng ký do họ tên quá dài. |  |  |  |  |
+| FR-01-BVA-07 | Kiểm tra mật khẩu dưới giới hạn tối thiểu | Họ Tên: ab<br>Email: user@example.com<br>Mật khẩu: P@ssw0<br>Xác nhận mật khẩu: P@ssw0 | 1. Truy cập trang đăng ký.<br>2. Nhập chuỗi "ab" vào trường Họ Tên, nhập "user@example.com" vào trường Email, nhập "P@ssw0" vào trường Mật khẩu, nhập "P@ssw0" vào trường Xác nhận mật khẩu.<br>3. Click chuột vào nút "Đăng ký" để gửi dữ liệu hệ thống. | Hệ thống từ chối đăng ký do mật khẩu quá ngắn. |  |  |  |  |
+| FR-01-BVA-08 | Kiểm tra mật khẩu tại giới hạn tối thiểu | Họ Tên: ab<br>Email: user@example.com<br>Mật khẩu: P@ssw0r<br>Xác nhận mật khẩu: P@ssw0r | 1. Truy cập trang đăng ký.<br>2. Nhập chuỗi "ab" vào trường Họ Tên, nhập "user@example.com" vào trường Email, nhập "P@ssw0r" vào trường Mật khẩu, nhập "P@ssw0r" vào trường Xác nhận mật khẩu.<br>3. Click chuột vào nút "Đăng ký" để gửi dữ liệu hệ thống. | Hệ thống từ chối đăng ký do mật khẩu không đủ mạnh. |  |  |  |  |
+| FR-01-BVA-09 | Kiểm tra mật khẩu trên giới hạn tối thiểu | Họ Tên: ab<br>Email: user@example.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Nhập chuỗi "ab" vào trường Họ Tên, nhập "user@example.com" vào trường Email, nhập "P@ssw0rd" vào trường Mật khẩu, nhập "P@ssw0rd" vào trường Xác nhận mật khẩu.<br>3. Click chuột vào nút "Đăng ký" để gửi dữ liệu hệ thống. | Hệ thống cho phép đăng ký. |  |  |  |  |
+
+**[Final Delivered Artifact]**
+# BÁO CÁO KẾT QUẢ THIẾT KẾ KỊCH BẢN KIỂM THỬ
+
+## I. KỊCH BẢN KIỂM THỬ THEO KỸ THUẬT DOMAIN TESTING
+
+### I. DETAILED STEP-BY-STEP DOMAIN ANALYSIS
+
+Để thiết kế bộ kịch bản kiểm thử cho tính năng đăng ký tài khoản, chúng ta cần phân tích kỹ lưỡng từng biến đầu vào và ràng buộc của chúng. Dưới đây là quá trình tư duy và bóc tách từng biến:
+
+1. **Họ Tên**:
+   - Miền hợp lệ (Valid Partitions): Chuỗi từ 2 đến 50 ký tự.
+   - Miền không hợp lệ (Invalid Partitions): Chuỗi dưới 2 ký tự, chuỗi trên 50 ký tự, chuỗi rỗng.
+   - Kiểm thử cần bao gồm các trường hợp biên (boundary values) như 1 ký tự, 2 ký tự, 50 ký tự, và 51 ký tự.
+
+2. **Email**:
+   - Miền hợp lệ: Chuỗi có định dạng hợp lệ (user@domain.com) và duy nhất trong hệ thống.
+   - Miền không hợp lệ: Chuỗi không có định dạng hợp lệ, chuỗi đã tồn tại trong hệ thống.
+   - Kiểm thử cần bao gồm các trường hợp như email hợp lệ, email không hợp lệ (ví dụ: thiếu @, không có domain), và email đã tồn tại.
+
+3. **Mật khẩu**:
+   - Miền hợp lệ: Chuỗi từ 8 ký tự trở lên, có ít nhất 1 chữ hoa, 1 chữ thường, 1 chữ số, và 1 ký tự đặc biệt.
+   - Miền không hợp lệ: Chuỗi dưới 8 ký tự, không có chữ hoa, không có chữ thường, không có chữ số, không có ký tự đặc biệt.
+   - Kiểm thử cần bao gồm các trường hợp như mật khẩu hợp lệ, mật khẩu không hợp lệ (ví dụ: dưới 8 ký tự, không có chữ hoa), và các trường hợp biên.
+
+4. **Xác nhận mật khẩu**:
+   - Miền hợp lệ: Chuỗi khớp với trường Mật khẩu.
+   - Miền không hợp lệ: Chuỗi không khớp với trường Mật khẩu.
+   - Kiểm thử cần bao gồm các trường hợp như xác nhận mật khẩu khớp và không khớp với mật khẩu.
+
+### II. DOMAIN TEST CASES TABLE
+
+| Test Case ID | Description | Input Data | Test Steps | Expected Result | Actual Result | Status | Tested By | Date Tested |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| FR-01-DT-01 | Kiểm thử đăng ký thành công | Họ Tên: Nguyễn Văn A<br>Email: test@example.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "test@example.com", Mật khẩu là "P@ssw0rd", Xác nhận mật khẩu là "P@ssw0rd".<br>3. Nhấn nút "Đăng ký". | Đăng ký thành công, chuyển tới trang Đăng nhập. |  |  |  |  |
+| FR-01-DT-02 | Kiểm thử họ tên dưới 2 ký tự | Họ Tên: A<br>Email: test2@example.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "A", Email là "test2@example.com", Mật khẩu là "P@ssw0rd", Xác nhận mật khẩu là "P@ssw0rd".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về họ tên. |  |  |  |  |
+| FR-01-DT-03 | Kiểm thử họ tên trên 50 ký tự | Họ Tên: Nguyễn Văn ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>Email: test3@example.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn ABCDEFGHIJKLMNOPQRSTUVWXYZ", Email là "test3@example.com", Mật khẩu là "P@ssw0rd", Xác nhận mật khẩu là "P@ssw0rd".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về họ tên. |  |  |  |  |
+| FR-01-DT-04 | Kiểm thử email không hợp lệ | Họ Tên: Nguyễn Văn A<br>Email: test@example<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "test@example", Mật khẩu là "P@ssw0rd", Xác nhận mật khẩu là "P@ssw0rd".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về email. |  |  |  |  |
+| FR-01-DT-05 | Kiểm thử mật khẩu dưới 8 ký tự | Họ Tên: Nguyễn Văn A<br>Email: test5@example.com<br>Mật khẩu: P@ss<br>Xác nhận mật khẩu: P@ss | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "test5@example.com", Mật khẩu là "P@ss", Xác nhận mật khẩu là "P@ss".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về mật khẩu. |  |  |  |  |
+| FR-01-DT-06 | Kiểm thử xác nhận mật khẩu không khớp | Họ Tên: Nguyễn Văn A<br>Email: test6@example.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0r | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "test6@example.com", Mật khẩu là "P@ssw0rd", Xác nhận mật khẩu là "P@ssw0r".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về xác nhận mật khẩu. |  |  |  |  |
+| FR-01-DT-07 | Kiểm thử email đã tồn tại | Họ Tên: Nguyễn Văn A<br>Email: test@example.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "test@example.com", Mật khẩu là "P@ssw0rd", Xác nhận mật khẩu là "P@ssw0rd".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về email đã tồn tại. |  |  |  |  |
+| FR-01-DT-08 | Kiểm thử đăng ký với mật khẩu không có chữ hoa | Họ Tên: Nguyễn Văn A<br>Email: test8@example.com<br>Mật khẩu: p@ssw0rd<br>Xác nhận mật khẩu: p@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "test8@example.com", Mật khẩu là "p@ssw0rd", Xác nhận mật khẩu là "p@ssw0rd".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về mật khẩu. |  |  |  |  |
+| FR-01-DT-09 | Kiểm thử đăng ký với mật khẩu không có chữ thường | Họ Tên: Nguyễn Văn A<br>Email: test9@example.com<br>Mật khẩu: P@SSW0RD<br>Xác nhận mật khẩu: P@SSW0RD | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "test9@example.com", Mật khẩu là "P@SSW0RD", Xác nhận mật khẩu là "P@SSW0RD".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về mật khẩu. |  |  |  |  |
+| FR-01-DT-10 | Kiểm thử đăng ký với mật khẩu không có chữ số | Họ Tên: Nguyễn Văn A<br>Email: test10@example.com<br>Mật khẩu: P@ssword<br>Xác nhận mật khẩu: P@ssword | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "test10@example.com", Mật khẩu là "P@ssword", Xác nhận mật khẩu là "P@ssword".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về mật khẩu. |  |  |  |  |
+| FR-01-DT-11 | Kiểm thử đăng ký với mật khẩu không có ký tự đặc biệt | Họ Tên: Nguyễn Văn A<br>Email: test11@example.com<br>Mật khẩu: Password123<br>Xác nhận mật khẩu: Password123 | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "test11@example.com", Mật khẩu là "Password123", Xác nhận mật khẩu là "Password123".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về mật khẩu. |  |  |  |  |
+| FR-01-DT-12 | Kiểm thử đăng ký với tất cả các trường hợp hợp lệ | Họ Tên: Nguyễn Văn A<br>Email: test12@example.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "test12@example.com", Mật khẩu là "P@ssw0rd", Xác nhận mật khẩu là "P@ssw0rd".<br>3. Nhấn nút "Đăng ký". | Đăng ký thành công, chuyển tới trang Đăng nhập. |  |  |  |  |
+
+## II. KỊCH BẢN KIỂM THỬ THEO KỸ THUẬT BOUNDARY VALUE ANALYSIS (BVA)
+
+### I. DETAILED STEP-BY-STEP BOUNDARY ANALYSIS
+
+Để áp dụng kỹ thuật Boundary Value Analysis (BVA) cho quá trình đăng ký tài khoản, chúng ta cần tập trung vào các biến có ranh giới số lượng hoặc độ dài số học. Trong trường hợp này, chúng ta có thể áp dụng BVA cho các biến sau:
+
+- **Họ Tên**: Giả sử độ dài tối thiểu là 2 ký tự và tối đa là 50 ký tự.
+- **Mật khẩu**: Có độ dài tối thiểu là 8 ký tự.
+
+Các bước phân tích BVA như sau:
+
+1. Xác định ranh giới (Boundary) cho từng biến:
+   - **Họ Tên**:
+     - Boundary dưới (MIN): 2 ký tự
+     - Boundary trên (MAX): 50 ký tự
+   - **Mật khẩu**:
+     - Boundary dưới (MIN): 8 ký tự
+
+2. Xác định các điểm ranh giới nhạy cảm:
+   - **Họ Tên**:
+     - Boundary - 1: 1 ký tự (dưới giới hạn tối thiểu)
+     - Boundary: 2 ký tự (giới hạn tối thiểu)
+     - Boundary + 1: 3 ký tự (trên giới hạn tối thiểu)
+     - Boundary - 1 (MAX): 49 ký tự (dưới giới hạn tối đa)
+     - Boundary (MAX): 50 ký tự (giới hạn tối đa)
+     - Boundary + 1 (MAX): 51 ký tự (trên giới hạn tối đa)
+   - **Mật khẩu**:
+     - Boundary - 1: 7 ký tự (dưới giới hạn tối thiểu)
+     - Boundary: 8 ký tự (giới hạn tối thiểu)
+     - Boundary + 1: 9 ký tự (trên giới hạn tối thiểu)
+
+Lý do các điểm lân cận biên này lại có nguy cơ phát sinh lỗi cao là vì chúng nằm ở ranh giới của các quy định về độ dài hoặc số lượng, và hệ thống có thể xử lý không đúng hoặc không đầy đủ ở những điểm này, dẫn đến lỗi.
+
+### II. BOUNDARY TEST CASES TABLE
+
+| Test Case ID | Description | Input Data | Test Steps | Expected Result | Actual Result | Status | Tested By | Date Tested |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| FR-01-BVA-01 | Kiểm tra họ tên dưới giới hạn tối thiểu | Họ Tên: a<br>Email: user@example.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Nhập chuỗi "a" vào trường Họ Tên, nhập "user@example.com" vào trường Email, nhập "P@ssw0rd" vào trường Mật khẩu, nhập "P@ssw0rd" vào trường Xác nhận mật khẩu.<br>3. Click chuột vào nút "Đăng ký" để gửi dữ liệu hệ thống. | Hệ thống từ chối đăng ký do họ tên quá ngắn. |  |  |  |  |
+| FR-01-BVA-02 | Kiểm tra họ tên tại giới hạn tối thiểu | Họ Tên: ab<br>Email: user@example.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Nhập chuỗi "ab" vào trường Họ Tên, nhập "user@example.com" vào trường Email, nhập "P@ssw0rd" vào trường Mật khẩu, nhập "P@ssw0rd" vào trường Xác nhận mật khẩu.<br>3. Click chuột vào nút "Đăng ký" để gửi dữ liệu hệ thống. | Hệ thống cho phép đăng ký. |  |  |  |  |
+| FR-01-BVA-03 | Kiểm tra họ tên trên giới hạn tối thiểu | Họ Tên: abc<br>Email: user@example.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Nhập chuỗi "abc" vào trường Họ Tên, nhập "user@example.com" vào trường Email, nhập "P@ssw0rd" vào trường Mật khẩu, nhập "P@ssw0rd" vào trường Xác nhận mật khẩu.<br>3. Click chuột vào nút "Đăng ký" để gửi dữ liệu hệ thống. | Hệ thống cho phép đăng ký. |  |  |  |  |
+| FR-01-BVA-04 | Kiểm tra họ tên dưới giới hạn tối đa | Họ Tên: abcdefghijklmnopqrstuvwx<br>Email: user@example.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Nhập chuỗi "abcdefghijklmnopqrstuvwx" vào trường Họ Tên, nhập "user@example.com" vào trường Email, nhập "P@ssw0rd" vào trường Mật khẩu, nhập "P@ssw0rd" vào trường Xác nhận mật khẩu.<br>3. Click chuột vào nút "Đăng ký" để gửi dữ liệu hệ thống. | Hệ thống cho phép đăng ký. |  |  |  |  |
+| FR-01-BVA-05 | Kiểm tra họ tên tại giới hạn tối đa | Họ Tên: abcdefghijklmnopqrstuvwxy<br>Email: user@example.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Nhập chuỗi "abcdefghijklmnopqrstuvwxyz" vào trường Họ Tên, nhập "user@example.com" vào trường Email, nhập "P@ssw0rd" vào trường Mật khẩu, nhập "P@ssw0rd" vào trường Xác nhận mật khẩu.<br>3. Click chuột vào nút "Đăng ký" để gửi dữ liệu hệ thống. | Hệ thống cho phép đăng ký. |  |  |  |  |
+| FR-01-BVA-06 | Kiểm tra họ tên trên giới hạn tối đa | Họ Tên: abcdefghijklmnopqrstuvwxyz1<br>Email: user@example.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Nhập chuỗi "abcdefghijklmnopqrstuvwxyz1" vào trường Họ Tên, nhập "user@example.com" vào trường Email, nhập "P@ssw0rd" vào trường Mật khẩu, nhập "P@ssw0rd" vào trường Xác nhận mật khẩu.<br>3. Click chuột vào nút "Đăng ký" để gửi dữ liệu hệ thống. | Hệ thống từ chối đăng ký do họ tên quá dài. |  |  |  |  |
+| FR-01-BVA-07 | Kiểm tra mật khẩu dưới giới hạn tối thiểu | Họ Tên: ab<br>Email: user@example.com<br>Mật khẩu: P@ssw0<br>Xác nhận mật khẩu: P@ssw0 | 1. Truy cập trang đăng ký.<br>2. Nhập chuỗi "ab" vào trường Họ Tên, nhập "user@example.com" vào trường Email, nhập "P@ssw0" vào trường Mật khẩu, nhập "P@ssw0" vào trường Xác nhận mật khẩu.<br>3. Click chuột vào nút "Đăng ký" để gửi dữ liệu hệ thống. | Hệ thống từ chối đăng ký do mật khẩu quá ngắn. |  |  |  |  |
+| FR-01-BVA-08 | Kiểm tra mật khẩu tại giới hạn tối thiểu | Họ Tên: ab<br>Email: user@example.com<br>Mật khẩu: P@ssw0r<br>Xác nhận mật khẩu: P@ssw0r | 1. Truy cập trang đăng ký.<br>2. Nhập chuỗi "ab" vào trường Họ Tên, nhập "user@example.com" vào trường Email, nhập "P@ssw0r" vào trường Mật khẩu, nhập "P@ssw0r" vào trường Xác nhận mật khẩu.<br>3. Click chuột vào nút "Đăng ký" để gửi dữ liệu hệ thống. | Hệ thống từ chối đăng ký do mật khẩu không đủ mạnh. |  |  |  |  |
+| FR-01-BVA-09 | Kiểm tra mật khẩu trên giới hạn tối thiểu | Họ Tên: ab<br>Email: user@example.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Nhập chuỗi "ab" vào trường Họ Tên, nhập "user@example.com" vào trường Email, nhập "P@ssw0rd" vào trường Mật khẩu, nhập "P@ssw0rd" vào trường Xác nhận mật khẩu.<br>3. Click chuột vào nút "Đăng ký" để gửi dữ liệu hệ thống. | Hệ thống cho phép đăng ký. |  |  |  |  |
+

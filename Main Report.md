@@ -127,3 +127,78 @@ FR-01-DT-09 đã được loại bỏ. Bộ còn lại 11 cases đủ coverage.
 - Phần giải trình BVA đã tự nhận thức đúng vấn đề — AI thừa nhận rằng các biến đầu vào của tính năng này đều là chuỗi enum cố định, không có ranh giới số học nào để đo. Đây là điểm hiếm gặp khi AI tự đánh giá đúng giới hạn của mình.
 - Tuy nhiên phần kết luận lại mâu thuẫn — thay vì dừng lại, AI vẫn cố sinh ra 9 test cases cho BVA bằng cách kiểm tra các chuyển đổi trạng thái hợp lệ/không hợp lệ. Đây là Domain Testing thuần túy, không liên quan gì đến BVA.
 - Về bản chất, tính năng Order State Machine không có thuộc tính nào có đơn vị đo — không có độ dài chuỗi, không có giá trị số, không có ngưỡng thời gian — nên BVA không áp dụng được cho feature này. Đây không phải lỗi của AI mà là đặc thù của bài toán.
+
+# FR-20: Làm lại FR-01 với bản Mobile - Đăng ký tài khoản
+## Domain Testing
+### Giải thích
+
+Để thiết kế bộ kịch bản kiểm thử cho tính năng đăng ký tài khoản, chúng ta cần phân tích kỹ lưỡng từng biến đầu vào và ràng buộc của chúng. Dưới đây là quá trình tư duy và bóc tách từng biến:
+
+1. **Họ Tên**:
+   - Miền hợp lệ (Valid Partitions): Chuỗi không rỗng.
+   - Miền không hợp lệ (Invalid Partitions): Chuỗi rỗng.
+
+2. **Email**:
+   - Miền hợp lệ: Chuỗi có định dạng hợp lệ (user@domain.com) và duy nhất trong hệ thống.
+   - Miền không hợp lệ: Chuỗi không có định dạng hợp lệ, chuỗi đã tồn tại trong hệ thống.
+   - Kiểm thử cần bao gồm các trường hợp như email hợp lệ, email không hợp lệ (ví dụ: thiếu @, không có domain), và email đã tồn tại.
+
+3. **Mật khẩu**:
+   - Miền hợp lệ: Chuỗi từ 8 ký tự trở lên, có ít nhất 1 chữ hoa, 1 chữ thường, 1 chữ số, và 1 ký tự đặc biệt.
+   - Miền không hợp lệ: Chuỗi dưới 8 ký tự, không có chữ hoa, không có chữ thường, không có chữ số, không có ký tự đặc biệt.
+   - Kiểm thử cần bao gồm các trường hợp như mật khẩu hợp lệ, mật khẩu không hợp lệ (ví dụ: dưới 8 ký tự, không có chữ hoa), và các trường hợp biên.
+
+4. **Xác nhận mật khẩu**:
+   - Miền hợp lệ: Chuỗi khớp với trường Mật khẩu.
+   - Miền không hợp lệ: Chuỗi không khớp với trường Mật khẩu.
+   - Kiểm thử cần bao gồm các trường hợp như xác nhận mật khẩu khớp và không khớp với mật khẩu.
+
+### Bảng Test Cases
+
+| Test Case ID | Description | Input Data | Test Steps | Expected Result | Actual Result | Status | Tested By | Date Tested |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| FR-01-Mobile-DT-01 | Kiểm thử đăng ký thành công | Họ Tên: Nguyễn Văn A<br>Email: mob.fr01.dt01@test.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "mob.fr01.dt01@test.com", Mật khẩu là "P@ssw0rd", Xác nhận mật khẩu là "P@ssw0rd".<br>3. Nhấn nút "Đăng ký". | Đăng ký thành công, chuyển tới trang Đăng nhập. |  |  |  |  |
+| FR-01-Mobile-DT-02 | Kiểm thử họ tên rỗng | Họ Tên: <br>Email: test2@example.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "", Email là "test2@example.com", Mật khẩu là "P@ssw0rd", Xác nhận mật khẩu là "P@ssw0rd".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về họ tên. |  |  |  |  |
+| FR-01-Mobile-DT-03 | Kiểm thử email không hợp lệ | Họ Tên: Nguyễn Văn A<br>Email: test.example<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "test.example", Mật khẩu là "P@ssw0rd", Xác nhận mật khẩu là "P@ssw0rd".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về email. |  |  |  |  |
+| FR-01-Mobile-DT-04 | Kiểm thử mật khẩu dưới 8 ký tự | Họ Tên: Nguyễn Văn A<br>Email: test5@example.com<br>Mật khẩu: P@ss<br>Xác nhận mật khẩu: P@ss | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "test5@example.com", Mật khẩu là "P@ss", Xác nhận mật khẩu là "P@ss".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về mật khẩu. |  |  |  |  |
+| FR-01-Mobile-DT-05 | Kiểm thử xác nhận mật khẩu không khớp | Họ Tên: Nguyễn Văn A<br>Email: test6@example.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0r | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "test6@example.com", Mật khẩu là "P@ssw0rd", Xác nhận mật khẩu là "P@ssw0r".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về xác nhận mật khẩu. |  |  |  |  |
+| FR-01-Mobile-DT-06 | Kiểm thử email đã tồn tại | Họ Tên: Nguyễn Văn A<br>Email: mob.fr01.existing@test.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "mob.fr01.existing@test.com", Mật khẩu là "P@ssw0rd", Xác nhận mật khẩu là "P@ssw0rd".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về email đã tồn tại. |  |  |  |  |
+| FR-01-Mobile-DT-07 | Kiểm thử đăng ký với mật khẩu không có chữ hoa | Họ Tên: Nguyễn Văn A<br>Email: test8@example.com<br>Mật khẩu: p@ssw0rd<br>Xác nhận mật khẩu: p@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "test8@example.com", Mật khẩu là "p@ssw0rd", Xác nhận mật khẩu là "p@ssw0rd".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về mật khẩu. |  |  |  |  |
+| FR-01-Mobile-DT-08 | Kiểm thử đăng ký với mật khẩu không có chữ thường | Họ Tên: Nguyễn Văn A<br>Email: test9@example.com<br>Mật khẩu: P@SSW0RD<br>Xác nhận mật khẩu: P@SSW0RD | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "test9@example.com", Mật khẩu là "P@SSW0RD", Xác nhận mật khẩu là "P@SSW0RD".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về mật khẩu. |  |  |  |  |
+| FR-01-Mobile-DT-09 | Kiểm thử đăng ký với mật khẩu không có chữ số | Họ Tên: Nguyễn Văn A<br>Email: test10@example.com<br>Mật khẩu: P@ssword<br>Xác nhận mật khẩu: P@ssword | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "test10@example.com", Mật khẩu là "P@ssword", Xác nhận mật khẩu là "P@ssword".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về mật khẩu. |  |  |  |  |
+| FR-01-Mobile-DT-10 | Kiểm thử đăng ký với mật khẩu không có ký tự đặc biệt | Họ Tên: Nguyễn Văn A<br>Email: test11@example.com<br>Mật khẩu: Password123<br>Xác nhận mật khẩu: Password123 | 1. Truy cập trang đăng ký.<br>2. Điền thông tin: Họ Tên là "Nguyễn Văn A", Email là "test11@example.com", Mật khẩu là "Password123", Xác nhận mật khẩu là "Password123".<br>3. Nhấn nút "Đăng ký". | Hiển thị lỗi về mật khẩu. |  |  |  |  |
+
+## Boundary Value Analysis
+### Giải thích
+Để áp dụng kỹ thuật Boundary Value Analysis (BVA) cho quá trình đăng ký tài khoản, chúng ta cần tập trung vào các biến có ranh giới số lượng hoặc độ dài số học. Trong trường hợp này, chúng ta có thể áp dụng BVA cho các biến sau:
+- **Mật khẩu**: Có độ dài tối thiểu là 8 ký tự.
+
+Các bước phân tích BVA như sau:
+
+1. Xác định ranh giới (Boundary) cho từng biến:
+   - **Mật khẩu**:
+     - Boundary dưới (MIN): 8 ký tự
+
+2. Xác định các điểm ranh giới nhạy cảm:
+   - **Mật khẩu**:
+     - Boundary - 1: 7 ký tự (dưới giới hạn tối thiểu)
+     - Boundary: 8 ký tự (giới hạn tối thiểu)
+     - Boundary + 1: 9 ký tự (trên giới hạn tối thiểu)
+
+Lý do các điểm lân cận biên này lại có nguy cơ phát sinh lỗi cao là vì chúng nằm ở ranh giới của các quy định về độ dài hoặc số lượng, và hệ thống có thể xử lý không đúng hoặc không đầy đủ ở những điểm này, dẫn đến lỗi.
+
+### Bảng Test Cases
+| Test Case ID | Description | Input Data | Test Steps | Expected Result | Actual Result | Status | Tested By | Date Tested |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| FR-01-Mobile-BVA-01 | Kiểm tra mật khẩu dưới giới hạn tối thiểu (7 ký tự) | Họ Tên: Nguyen Van A<br>Email: mob.fr01.bva.01@test.com<br>Mật khẩu: P@ssw0r<br>Xác nhận mật khẩu: P@ssw0r | 1. Truy cập trang đăng ký.<br>2. Nhập chuỗi "Nguyen Van A" vào trường Họ Tên, nhập "mob.fr01.bva.01@test.com" vào trường Email, nhập "P@ssw0r" vào trường Mật khẩu, nhập "P@ssw0r" vào trường Xác nhận mật khẩu.<br>3. Click chuột vào nút "Đăng ký" để gửi dữ liệu hệ thống. | Hệ thống từ chối đăng ký do mật khẩu quá ngắn. |  |  |  |  |
+| FR-01-Mobile-BVA-02 | Kiểm tra mật khẩu tại giới hạn tối thiểu (8 ký tự) | Họ Tên: Nguyen Van A<br>Email: mob.fr01.bva.02@test.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd | 1. Truy cập trang đăng ký.<br>2. Nhập chuỗi "Nguyen Van A" vào trường Họ Tên, nhập "mob.fr01.bva.02@test.com" vào trường Email, nhập "P@ssw0rd" vào trường Mật khẩu, nhập "P@ssw0rd" vào trường Xác nhận mật khẩu.<br>3. Click chuột vào nút "Đăng ký" để gửi dữ liệu hệ thống. | Hệ thống cho phép đăng ký. |  |  |  |  |
+| FR-01-Mobile-BVA-03 | Kiểm tra mật khẩu trên giới hạn tối thiểu (9 ký tự) | Họ Tên: Nguyen Van A<br>Email: mob.fr01.bva.03@test.com<br>Mật khẩu: P@ssw0rd1<br>Xác nhận mật khẩu: P@ssw0rd1 | 1. Truy cập trang đăng ký.<br>2. Nhập chuỗi "Nguyen Van A" vào trường Họ Tên, nhập "mob.fr01.bva.03@test.com" vào trường Email, nhập "P@ssw0rd1" vào trường Mật khẩu, nhập "P@ssw0rd1" vào trường Xác nhận mật khẩu.<br>3. Click chuột vào nút "Đăng ký" để gửi dữ liệu hệ thống. | Hệ thống cho phép đăng ký. |  |  |  |  |
+
+## AI gap analysis
+1. AI tự đặt ra ràng buộc độ dài Họ Tên ngay trong phần Domain Testing (MIN = 2, MAX = 50), rồi sinh hẳn 2 test case dựa trên đó (DT-02, DT-03). Spec gốc chỉ nói Họ Tên là trường bắt buộc, không đề cập bất kỳ giới hạn độ dài nào. Hệ quả là sinh ra những test cases kiểm tra điều kiện hệ thống chưa bao giờ định nghĩa, và có test case bị trùng.
+
+2. AI tạo test case BVA để kiểm tra biên độ dài Họ Tên — một ràng buộc tự bịa không có trong spec gốc. 
+
+3. Data trong test cases BVA không khớp với label mô tả
+   - BVA-07 (trước khi chỉnh sửa): ghi "Boundary-1" nhưng P@ssw0 là 6 ký tự (Boundary-2)
+   - BVA-08 (trước khi chỉnh sửa): ghi "Boundary" nhưng P@ssw0r là 7 ký tự (Boundary-1)
