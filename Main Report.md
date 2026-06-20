@@ -184,3 +184,103 @@ BVA không áp dụng cho FR-10 vì không có ràng buộc số học hoặc đ
 ```
 - Tuy nhiên, ở phần mô tả bên dưới lại có **"Khi đơn hàng đã ở trạng thái shipping, User không được phép tự hủy — chỉ Admin mới có thể thao tác."** -> Thực chất `Admin` có thể hủy từ `shipping`.
 - Chính sự mâu thuẫn này trong spec đã dẫn đến việc AI tạo ra test case FR-10-DT-09 với Expected Result sai. 
+
+# FR-20: Chọn FR-01: Đăng ký tài khoản nhưng làm ở bản Mobile
+## Domain Testing
+
+### Giải thích
+
+Đối với FR-20: Chọn FR-01: Đăng ký tài khoản và làm ở bản Mobile, các biến đầu vào và ràng buộc nghiệp vụ cần được bóc tách như sau:
+
+1. **Họ Tên**
+   - Kiểu dữ liệu: Chuỗi ký tự.
+   - Ràng buộc: Bắt buộc nhập, không được rỗng.
+   - Miền hợp lệ: Bất kỳ chuỗi không rỗng nào biểu diễn họ tên người dùng, ví dụ "Nguyen Van A".
+   - Miền không hợp lệ: Chuỗi rỗng, hoặc bỏ trống trường.
+
+2. **Email**
+   - Kiểu dữ liệu: Chuỗi ký tự.
+   - Ràng buộc: Bắt buộc nhập, phải có định dạng hợp lệ theo mẫu `user@domain.com`, và phải là duy nhất trong hệ thống.
+   - Miền hợp lệ: Chuỗi có cấu trúc email đúng cú pháp và chưa tồn tại trong hệ thống, ví dụ "fr20.user01@test.com".
+   - Miền không hợp lệ: Chuỗi sai định dạng email, ví dụ thiếu ký tự `@`, thiếu phần domain, hoặc email đã được đăng ký trước đó.
+
+3. **Mật khẩu**
+   - Kiểu dữ liệu: Chuỗi ký tự.
+   - Ràng buộc: Bắt buộc nhập, tối thiểu 8 ký tự, phải có ít nhất 1 chữ hoa, 1 chữ thường, 1 chữ số và 1 ký tự đặc biệt thuộc tập `@`, `$`, `!`, `%`, `*`, `?`, `&`.
+   - Miền hợp lệ: Chuỗi đáp ứng đồng thời tất cả điều kiện trên, ví dụ "P@ssw0rd".
+   - Miền không hợp lệ: Chuỗi ngắn hơn 8 ký tự, hoặc thiếu một trong bốn nhóm ký tự bắt buộc.
+
+4. **Xác nhận mật khẩu**
+   - Kiểu dữ liệu: Chuỗi ký tự.
+   - Ràng buộc: Bắt buộc nhập và phải khớp tuyệt đối với trường Mật khẩu.
+   - Miền hợp lệ: Giá trị trùng hoàn toàn với Mật khẩu.
+   - Miền không hợp lệ: Giá trị khác Mật khẩu dù chỉ khác 1 ký tự.
+
+5. **Bối cảnh Mobile**
+   - Kiểu dữ liệu: Bối cảnh giao diện người dùng.
+   - Ràng buộc: Luồng thao tác phải thực hiện được trên màn hình di động với các trường nhập và nút hành động hiển thị rõ ràng.
+   - Miền hợp lệ: Người dùng có thể nhập đủ dữ liệu và thực hiện đăng ký thành công trên giao diện mobile.
+   - Miền không hợp lệ: Giao diện không hiển thị đủ trường bắt buộc, nút đăng ký không thao tác được, hoặc luồng điều hướng sau đăng ký không chuyển đúng trang Đăng nhập.
+
+Từ phân tích trên, logic nghiệp vụ chính cần kiểm tra là: tất cả trường bắt buộc phải được nhập đầy đủ, email phải đúng định dạng và chưa tồn tại, mật khẩu phải thỏa toàn bộ chính sách an toàn, xác nhận mật khẩu phải khớp, giao diện mobile phải cho phép thao tác đầy đủ trên thiết bị di động, và khi mọi điều kiện đều hợp lệ thì hệ thống phải chuyển người dùng tới trang Đăng nhập sau khi đăng ký thành công.
+
+### Domain Test Cases
+
+| Test Case ID | Description                                                         | Input Data                                                                                                                     | Test Steps                                                                                                                                                                                                                                                                                                            | Expected Result                                                         | Actual Result | Status | Tested By | Date Tested |
+| ------------ | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | ------------- | ------ | --------- | ----------- |
+| FR-20-DT-01  | Đăng ký thành công trên giao diện mobile với toàn bộ dữ liệu hợp lệ | Họ Tên: Nguyen Van A<br>Email: fr20.dt01@test.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd<br>Bối cảnh: Mobile     | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Nhập "Nguyen Van A" vào trường Họ Tên.<br>4. Nhập "fr20.dt01@test.com" vào trường Email.<br>5. Nhập "P@ssw0rd" vào trường Mật khẩu.<br>6. Nhập "P@ssw0rd" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký".     | Đăng ký thành công và hệ thống chuyển sang trang Đăng nhập.             |               |        |           |             |
+| FR-20-DT-02  | Từ chối khi Họ Tên bị bỏ trống trên mobile                          | Họ Tên: <br>Email: fr20.dt02@test.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd<br>Bối cảnh: Mobile                 | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Để trống trường Họ Tên.<br>4. Nhập "fr20.dt02@test.com" vào trường Email.<br>5. Nhập "P@ssw0rd" vào trường Mật khẩu.<br>6. Nhập "P@ssw0rd" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký".                    | Hiển thị lỗi bắt buộc nhập Họ Tên và không cho phép gửi form.           |               |        |           |             |
+| FR-20-DT-03  | Từ chối khi Email sai định dạng do thiếu ký tự @                    | Họ Tên: Nguyen Van A<br>Email: fr20.dt03.test.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd<br>Bối cảnh: Mobile     | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Nhập "Nguyen Van A" vào trường Họ Tên.<br>4. Nhập "fr20.dt03.test.com" vào trường Email.<br>5. Nhập "P@ssw0rd" vào trường Mật khẩu.<br>6. Nhập "P@ssw0rd" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký".     | Hiển thị lỗi định dạng Email không hợp lệ và không cho phép gửi form.   |               |        |           |             |
+| FR-20-DT-04  | Từ chối khi Email đã tồn tại trong hệ thống                         | Họ Tên: Nguyen Van A<br>Email: fr20.existing@test.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd<br>Bối cảnh: Mobile | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Nhập "Nguyen Van A" vào trường Họ Tên.<br>4. Nhập "fr20.existing@test.com" vào trường Email.<br>5. Nhập "P@ssw0rd" vào trường Mật khẩu.<br>6. Nhập "P@ssw0rd" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký". | Hiển thị lỗi Email đã được sử dụng và không cho phép tạo tài khoản mới. |               |        |           |             |
+| FR-20-DT-05  | Từ chối khi Mật khẩu chỉ có 7 ký tự                                 | Họ Tên: Nguyen Van A<br>Email: fr20.dt05@test.com<br>Mật khẩu: P@ssw0r<br>Xác nhận mật khẩu: P@ssw0r<br>Bối cảnh: Mobile       | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Nhập "Nguyen Van A" vào trường Họ Tên.<br>4. Nhập "fr20.dt05@test.com" vào trường Email.<br>5. Nhập "P@ssw0r" vào trường Mật khẩu.<br>6. Nhập "P@ssw0r" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký".       | Hiển thị lỗi Mật khẩu phải có tối thiểu 8 ký tự.                        |               |        |           |             |
+| FR-20-DT-06  | Từ chối khi Mật khẩu thiếu chữ hoa                                  | Họ Tên: Nguyen Van A<br>Email: fr20.dt06@test.com<br>Mật khẩu: p@ssw0rd<br>Xác nhận mật khẩu: p@ssw0rd<br>Bối cảnh: Mobile     | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Nhập "Nguyen Van A" vào trường Họ Tên.<br>4. Nhập "fr20.dt06@test.com" vào trường Email.<br>5. Nhập "p@ssw0rd" vào trường Mật khẩu.<br>6. Nhập "p@ssw0rd" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký".     | Hiển thị lỗi Mật khẩu phải có ít nhất 1 chữ hoa.                        |               |        |           |             |
+| FR-20-DT-07  | Từ chối khi Mật khẩu thiếu chữ thường                               | Họ Tên: Nguyen Van A<br>Email: fr20.dt07@test.com<br>Mật khẩu: P@SSW0RD<br>Xác nhận mật khẩu: P@SSW0RD<br>Bối cảnh: Mobile     | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Nhập "Nguyen Van A" vào trường Họ Tên.<br>4. Nhập "fr20.dt07@test.com" vào trường Email.<br>5. Nhập "P@SSW0RD" vào trường Mật khẩu.<br>6. Nhập "P@SSW0RD" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký".     | Hiển thị lỗi Mật khẩu phải có ít nhất 1 chữ thường.                     |               |        |           |             |
+| FR-20-DT-08  | Từ chối khi Mật khẩu thiếu chữ số                                   | Họ Tên: Nguyen Van A<br>Email: fr20.dt08@test.com<br>Mật khẩu: P@ssword<br>Xác nhận mật khẩu: P@ssword<br>Bối cảnh: Mobile     | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Nhập "Nguyen Van A" vào trường Họ Tên.<br>4. Nhập "fr20.dt08@test.com" vào trường Email.<br>5. Nhập "P@ssword" vào trường Mật khẩu.<br>6. Nhập "P@ssword" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký".     | Hiển thị lỗi Mật khẩu phải có ít nhất 1 chữ số.                         |               |        |           |             |
+| FR-20-DT-09  | Từ chối khi Mật khẩu thiếu ký tự đặc biệt                           | Họ Tên: Nguyen Van A<br>Email: fr20.dt09@test.com<br>Mật khẩu: Password1<br>Xác nhận mật khẩu: Password1<br>Bối cảnh: Mobile   | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Nhập "Nguyen Van A" vào trường Họ Tên.<br>4. Nhập "fr20.dt09@test.com" vào trường Email.<br>5. Nhập "Password1" vào trường Mật khẩu.<br>6. Nhập "Password1" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký".   | Hiển thị lỗi Mật khẩu phải có ít nhất 1 ký tự đặc biệt hợp lệ.          |               |        |           |             |
+| FR-20-DT-10  | Từ chối khi Xác nhận mật khẩu không khớp                            | Họ Tên: Nguyen Van A<br>Email: fr20.dt10@test.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rD<br>Bối cảnh: Mobile     | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Nhập "Nguyen Van A" vào trường Họ Tên.<br>4. Nhập "fr20.dt10@test.com" vào trường Email.<br>5. Nhập "P@ssw0rd" vào trường Mật khẩu.<br>6. Nhập "P@ssw0rD" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký".     | Hiển thị lỗi Xác nhận mật khẩu không khớp với Mật khẩu.                 |               |        |           |             |
+
+## Boundary Value Analysis
+
+### Giải thích
+
+Trong FR-20, các ràng buộc có tính chất biên và có thể lượng hóa bằng số hoặc độ dài chuỗi gồm:
+
+1. **Độ dài Mật khẩu**
+   - Ràng buộc tối thiểu: 8 ký tự.
+   - Điểm biên cần xét: 7 ký tự, 8 ký tự, 9 ký tự.
+   - Tại $n = 7$, hệ thống phải từ chối vì nhỏ hơn ngưỡng tối thiểu.
+   - Tại $n = 8$, hệ thống phải chấp nhận nếu các điều kiện thành phần khác đều hợp lệ.
+   - Tại $n = 9$, hệ thống vẫn phải chấp nhận nếu các điều kiện thành phần khác đều hợp lệ.
+
+2. **Số lượng chữ hoa trong Mật khẩu**
+   - Ràng buộc tối thiểu: ít nhất 1 chữ hoa.
+   - Điểm biên cần xét: 0 chữ hoa, 1 chữ hoa, 2 chữ hoa.
+
+3. **Số lượng chữ thường trong Mật khẩu**
+   - Ràng buộc tối thiểu: ít nhất 1 chữ thường.
+   - Điểm biên cần xét: 0 chữ thường, 1 chữ thường, 2 chữ thường.
+
+4. **Số lượng chữ số trong Mật khẩu**
+   - Ràng buộc tối thiểu: ít nhất 1 chữ số.
+   - Điểm biên cần xét: 0 chữ số, 1 chữ số, 2 chữ số.
+
+5. **Số lượng ký tự đặc biệt trong Mật khẩu**
+   - Ràng buộc tối thiểu: ít nhất 1 ký tự đặc biệt thuộc tập `@`, `$`, `!`, `%`, `*`, `?`, `&`.
+   - Điểm biên cần xét: 0 ký tự đặc biệt, 1 ký tự đặc biệt, 2 ký tự đặc biệt.
+
+6. **Số lượng trường bắt buộc trên form**
+   - Ràng buộc nghiệp vụ: 4 trường bắt buộc phải được nhập đầy đủ.
+   - Điểm biên cần xét theo kiểm tra thực thi luồng: 3 trường hợp điền đủ và 1 trường bỏ trống để xác nhận hệ thống ngăn submit.
+
+Từ góc nhìn kiểm thử, các điểm 0, 1 và 2 là vùng nhạy cảm vì lỗi thường phát sinh tại ngưỡng tối thiểu: lập trình viên có thể so sánh sai điều kiện "lớn hơn" với "lớn hơn hoặc bằng", hoặc đếm sai số lượng ký tự ở đúng ngưỡng chuyển trạng thái hợp lệ. Khi kiểm tra biên của một biến, các trường bắt buộc khác trên form phải luôn được điền bằng giá trị hợp lệ để cô lập lỗi.
+
+### Boundary Test Cases
+
+| Test Case ID | Description                                 | Input Data                                                                                                                                        | Test Steps                                                                                                                                                                                                                                                                                                           | Expected Result                                                                                             | Actual Result | Status | Tested By | Date Tested |
+| ------------ | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | ------------- | ------ | --------- | ----------- |
+| FR-20-BVA-01 | Kiểm tra Mật khẩu tại biên dưới với 7 ký tự | Họ Tên: Nguyen Van A<br>Email: fr20.bva01@test.com<br>Mật khẩu: P@ssw0r (7 ký tự)<br>Xác nhận mật khẩu: P@ssw0r (7 ký tự)<br>Bối cảnh: Mobile     | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Nhập "Nguyen Van A" vào trường Họ Tên.<br>4. Nhập "fr20.bva01@test.com" vào trường Email.<br>5. Nhập "P@ssw0r" vào trường Mật khẩu.<br>6. Nhập "P@ssw0r" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký".     | Hệ thống từ chối vì độ dài mật khẩu chỉ đạt 7 ký tự, nhỏ hơn ngưỡng tối thiểu 8 ký tự.                      |               |        |           |             |
+| FR-20-BVA-02 | Kiểm tra Mật khẩu tại biên với 8 ký tự      | Họ Tên: Nguyen Van A<br>Email: fr20.bva02@test.com<br>Mật khẩu: P@ssw0rd (8 ký tự)<br>Xác nhận mật khẩu: P@ssw0rd (8 ký tự)<br>Bối cảnh: Mobile   | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Nhập "Nguyen Van A" vào trường Họ Tên.<br>4. Nhập "fr20.bva02@test.com" vào trường Email.<br>5. Nhập "P@ssw0rd" vào trường Mật khẩu.<br>6. Nhập "P@ssw0rd" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký".   | Hệ thống chấp nhận vì mật khẩu đạt đúng ngưỡng tối thiểu 8 ký tự và thỏa các điều kiện thành phần bắt buộc. |               |        |           |             |
+| FR-20-BVA-03 | Kiểm tra Mật khẩu tại biên trên với 9 ký tự | Họ Tên: Nguyen Van A<br>Email: fr20.bva03@test.com<br>Mật khẩu: P@ssw0rd1 (9 ký tự)<br>Xác nhận mật khẩu: P@ssw0rd1 (9 ký tự)<br>Bối cảnh: Mobile | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Nhập "Nguyen Van A" vào trường Họ Tên.<br>4. Nhập "fr20.bva03@test.com" vào trường Email.<br>5. Nhập "P@ssw0rd1" vào trường Mật khẩu.<br>6. Nhập "P@ssw0rd1" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký". | Hệ thống chấp nhận vì mật khẩu vượt qua ngưỡng tối thiểu và vẫn thỏa toàn bộ điều kiện bảo mật.             |               |        |           |             |
+
+## AI Gap Analysis
+**Phần này giống với FR-01: Đăng ký tài khoản.**

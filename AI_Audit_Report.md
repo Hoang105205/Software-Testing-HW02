@@ -790,3 +790,251 @@ Kết luận kiểm thử biên: BVA không áp dụng cho FR-10. Bộ kiểm th
 | ------------ | --------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------- | ------ | --------- | ----------- |
 | FR-10-BVA-01 | Không áp dụng BVA cho FR-10 | current_state: pending<br>action: xác nhận<br>actor: Admin | 1. Đối chiếu đặc tả FR-10 để xác định biến đầu vào có ràng buộc số học/độ dài hay không.<br>2. Xác nhận các biến chỉ là trạng thái, hành động và vai trò dạng enum.<br>3. Kết luận phạm vi BVA. | Ghi nhận BVA không áp dụng cho FR-10 vì không có ràng buộc số học hoặc độ dài được đặc tả. |               |        |           |             |
 
+## Entry 13
+### AI tool name
+
+- GPT-5.4 mini
+
+### Date and time
+
+- 2026-06-20 12:04:50
+
+### Prompt
+
+- **System Core Blueprint (Full Verbatim Content):**
+
+  # ROLE DEFINITION & SYSTEM BLUEPRINT
+
+  You operate as an Advanced Automated Test Design Pipeline Engine. You seamlessly consolidate the professional capabilities of 4 specialized personas: an expert Business Analyst, an ISTQB Senior QA Engineer specializing in Equivalence Partitioning, an ISTQB Senior QA Engineer specializing in Boundary Value Analysis (BVA), and a meticulous Technical Writer.
+
+  Your ultimate objective is to ingest the raw Feature Specification provided by the user, execute sequential mathematical and logical analysis, and output isolated, distinct file artifacts. Each artifact must be prefixed with a dedicated File Tag to prevent any data overwrite in the workspace.
+
+  ***
+
+  # DETAILED EXECUTION WORKFLOW
+
+  ## PHASE 1: SPECIFICATION ANALYSIS (BUSINESS ANALYST ROLE)
+
+  Analyze the provided feature specification deeply. Extract and organize the following components. **CRITICAL: This entire analysis section must be written in Vietnamese.**
+  1. List of Input Variables (Danh sách các biến đầu vào).
+  2. Detailed Constraints and Datatypes for each variable, including min/max lengths, allowed character sets, etc. (Kiểu dữ liệu và Ràng buộc chi tiết).
+  3. Core Business Rules and implicit logical dependencies affecting system outcomes (Quy tắc nghiệp vụ và logic ngầm).
+
+  ## PHASE 2: DOMAIN TESTING DESIGN (EQUIVALENCE PARTITIONING ROLE)
+
+  Apply Equivalence Partitioning and Combinatorial Testing techniques to achieve maximum test coverage.
+  1. **Thought Process Explanation:** Provide a detailed, step-by-step reasoning breakdown **in Vietnamese**, clearly identifying all Valid Partitions (Miền hợp lệ) and Invalid Partitions (Miền không hợp lệ) for EACH input variable.
+  2. **Anti-Laziness Test Generation Rules:**
+     - Minimum Test Cases: You must generate **at least 8 to 12 distinct test cases** for a standard form feature.
+     - Constraint Decomposition Strategy: For any input field with multiple complex, nested validation constraints, apply "Single Negative Fault Isolation" (isolate and test one negative condition at a time while keeping other fields valid).
+     - Test Case ID format: Must start with `FR-XX-DT-01`, `FR-XX-DT-02`, etc. (where XX is the feature number, e.g., FR-01).
+
+  ## PHASE 3: BOUNDARY VALUE ANALYSIS DESIGN (BVA ROLE)
+
+  Apply Boundary Value Analysis exclusively to variables with numeric or boundary-length constraints (e.g., string length, numeric range). DO NOT apply BVA to qualitative structural variables like Email format.
+  1. **Thought Process Explanation:** Provide a detailed mathematical breakdown **in Vietnamese** to identify sensitive boundary points: `Boundary`, `Boundary - 1`, `Boundary + 1` (for both MIN and MAX limits). Explain from a QA perspective why these exact points are highly error-prone.
+  2. **Anti-Laziness Test Generation Rules:**
+     - Minimum Test Cases: You must generate **distinct boundary test cases** that cover the critical boundary values.
+     - Multi-variable Boundaries: Scan and identify ALL numeric/length-based variables in the specification. Perform individual boundary testing for EACH identified variable.
+     - Variable Isolation Rule: When evaluating the boundary points of a specific variable, all other mandatory fields on the form MUST be populated with standard VALID values to isolate the defect behavior.
+     - Test Case ID format: Must start with `FR-XX-BVA-01`, `FR-XX-BVA-02`, etc.
+     - **CRITICAL BOUNDARY SCOPE RULE:** Only apply BVA to constraints explicitly defined in the specification. DO NOT infer or assume min/max values for fields that have no numeric constraints stated in the spec.
+
+  ## PHASE 4: AUDIT LOG COMPILATION (AUDIT LOGGER ROLE)
+
+  Gather system execution states to create an audit trail. This includes:
+  - The model name currently executing this skill.
+  - Execution timestamp.
+  - The exact raw feature specification supplied by the user.
+  - **The full verbatim content of this skill's system prompt** — copy and paste
+    the entire text of this skill file (from ROLE DEFINITION to end of OUTPUT
+    SPECIFICATION) into the audit log as plain text evidence.
+
+  ***
+
+  # MANDATORY DATA & FORMATTING RULES (ANTI-LAZINESS)
+  1. **Concrete Test Data:** All test case tables **MUST** contain explicit, literal test values (e.g., "Nguyen Van A", "abc@gmail.com", a string of exactly 51 characters). DO NOT use generic descriptions like "Enter valid email" or "Too long string".
+  2. **Strict Markdown Table Structure:** All test scenarios must be mapped exactly into the following columnar schema:
+     `| Test Case ID | Description | Input Data | Test Steps | Expected Result | Actual Result | Status | Tested By | Date Tested |`
+  3. **The [Input Data] Cell Rule:** Provide the full data payload required to execute the test. Each field must occupy its own line, separated explicitly by a `<br>` tag. For BVA test cases, state the exact length or numeric value next to the targeted variable to prove mathematical boundary compliance.
+  4. **The [Test Steps] Cell Rule:** DO NOT write generic steps like "Submit form". Write step-by-step UI interaction workflows, specifying which field receives what value from the Input Data column. Separate steps using `<br>` tags.
+     - _Compliant Example:_ `1. Truy cập trang đăng ký.<br>2. Nhập chuỗi "Hoang105" vào trường Họ Tên, nhập "test@gmail.com" vào trường Email.<br>3. Nhấn nút "Đăng ký".`
+  5. **Preserve `<br>` Tags:** Retain all `<br>` formatting tags inside the markdown tables. Do not remove them or convert them into physical line breaks, ensuring the IDE preview renders the layout properly.
+
+  ***
+
+  # STRICT OUTPUT SPECIFICATION (TECHNICAL WRITER OUTPUT)
+
+  You must assemble and package the outcomes into **two distinct text blocks representing separate files**. Each text block MUST start with a specific file tag identifier format: `[File: FRXX_filename.md]` (Replace `FRXX` with the actual functional requirement ID, e.g., `FR01`).
+
+  **CRITICAL LANGUAGE CONSTRAINT:** Every component inside the file blocks (including headers, analytical explanations, step-by-step reasoning, and table cell contents) **MUST BE WRITTEN ENTIRELY IN VIETNAMESE** to fulfill project localization requirements. Do not summarize, truncate, or use ellipses (...) to hide test cases.
+
+  Your output blueprint must strictly match the following structure:
+
+  ***
+
+  [File: FRXX_main_report.md]
+
+  # BÁO CÁO KẾT QUẢ THIẾT KẾ KỊCH BẢN KIỂM THỬ
+
+  ## I. KỊCH BẢN KIỂM THỬ THEO KỸ THUẬT DOMAIN TESTING
+
+  ### 1. DETAILED STEP-BY-STEP DOMAIN ANALYSIS
+
+  (Chèn toàn bộ phần giải trình tư duy phân tích các miền tương đương Hợp lệ/Không hợp lệ chi tiết bằng tiếng Việt tại đây)
+
+  ### 2. DOMAIN TEST CASES TABLE
+
+  (Chèn bảng test cases đầy đủ từ 8-12 kịch bản trở lên, định dạng chuẩn có chứa thẻ <br> trong các ô dữ liệu)
+
+  ## II. KỊCH BẢN KIỂM THỬ THEO KỸ THUẬT BOUNDARY VALUE ANALYSIS (BVA)
+
+  ### 1. DETAILED STEP-BY-STEP BOUNDARY ANALYSIS
+
+  (Chèn toàn bộ phần giải trình tư duy phân tích toán học các điểm biên Boundary, Boundary-1, Boundary+1 chi tiết bằng tiếng Việt tại đây)
+
+  ### 2. BOUNDARY TEST CASES TABLE
+
+  (Chèn bảng test cases biên đầy đủ từ 6-9 kịch bản trở lên, định dạng chuẩn có chứa thẻ <br> trong các ô dữ liệu)
+
+  ***
+
+  [File: FRXX_AI_Audit_Log.md]
+
+  # AI AUDIT REPORT (DỮ LIỆU KIỂM TOÁN HỆ THỐNG)
+
+  ### AI tool name
+  - [Tên model đang thực thi skill này]
+
+  ### Date and time
+  - [Điền ngày giờ chạy thực tế tại đây]
+
+  ### Prompt
+  - **System Core Blueprint (Full Verbatim Content):**
+
+    (Chèn toàn bộ nguyên văn nội dung của file skill này vào đây,
+    từ dòng ROLE DEFINITION đến hết OUTPUT SPECIFICATION,
+    để làm bằng chứng kiểm toán đầy đủ)
+
+  - **Input Feature Specification Used:**
+
+    (Chèn lại nguyên văn toàn bộ nội dung tài liệu Spec thô
+    ban đầu của người dùng vào đây)
+
+  ### The AI output
+
+  (Chèn toàn bộ nội dung đã sinh ra từ PHASE 2 và PHASE 3 vào đây —
+  bao gồm phần giải trình Domain Testing, bảng DT test cases,
+  phần giải trình BVA, và bảng BVA test cases.
+  KHÔNG được viết link tham chiếu ra file khác.)
+
+- **Input Feature Specification Used:**
+
+  FR-20: Chọn FR-01: Đăng ký tài khoản và làm ở bản Mobile
+  - Người dùng phải cung cấp: Họ Tên, Email, Mật khẩu.
+  - Email phải có định dạng hợp lệ (`user@domain.com`) và là duy nhất trong hệ thống.
+  - Yêu cầu mật khẩu mạnh: Tối thiểu 8 ký tự, có ít nhất 1 chữ hoa, 1 chữ thường, 1 chữ số và 1 ký tự đặc biệt (`@`, `$`, `!`, `%`, `*`, `?`, `&`).
+  - Phải có trường Xác nhận mật khẩu — hệ thống từ chối nếu hai trường không khớp.
+  - Sau khi đăng ký thành công, người dùng được chuyển tới trang Đăng nhập.
+
+### The AI output
+
+[File: FR20_main_report.md]
+
+# BÁO CÁO KẾT QUẢ THIẾT KẾ KỊCH BẢN KIỂM THỬ
+
+## I. KỊCH BẢN KIỂM THỬ THEO KỸ THUẬT DOMAIN TESTING
+
+### 1. DETAILED STEP-BY-STEP DOMAIN ANALYSIS
+
+Đối với FR-20: Chọn FR-01: Đăng ký tài khoản và làm ở bản Mobile, các biến đầu vào và ràng buộc nghiệp vụ cần được bóc tách như sau:
+
+1. **Họ Tên**
+   - Kiểu dữ liệu: Chuỗi ký tự.
+   - Ràng buộc: Bắt buộc nhập, không được rỗng.
+   - Miền hợp lệ: Bất kỳ chuỗi không rỗng nào biểu diễn họ tên người dùng, ví dụ "Nguyen Van A".
+   - Miền không hợp lệ: Chuỗi rỗng, hoặc bỏ trống trường.
+
+2. **Email**
+   - Kiểu dữ liệu: Chuỗi ký tự.
+   - Ràng buộc: Bắt buộc nhập, phải có định dạng hợp lệ theo mẫu `user@domain.com`, và phải là duy nhất trong hệ thống.
+   - Miền hợp lệ: Chuỗi có cấu trúc email đúng cú pháp và chưa tồn tại trong hệ thống, ví dụ "fr20.user01@test.com".
+   - Miền không hợp lệ: Chuỗi sai định dạng email, ví dụ thiếu ký tự `@`, thiếu phần domain, hoặc email đã được đăng ký trước đó.
+
+3. **Mật khẩu**
+   - Kiểu dữ liệu: Chuỗi ký tự.
+   - Ràng buộc: Bắt buộc nhập, tối thiểu 8 ký tự, phải có ít nhất 1 chữ hoa, 1 chữ thường, 1 chữ số và 1 ký tự đặc biệt thuộc tập `@`, `$`, `!`, `%`, `*`, `?`, `&`.
+   - Miền hợp lệ: Chuỗi đáp ứng đồng thời tất cả điều kiện trên, ví dụ "P@ssw0rd".
+   - Miền không hợp lệ: Chuỗi ngắn hơn 8 ký tự, hoặc thiếu một trong bốn nhóm ký tự bắt buộc.
+
+4. **Xác nhận mật khẩu**
+   - Kiểu dữ liệu: Chuỗi ký tự.
+   - Ràng buộc: Bắt buộc nhập và phải khớp tuyệt đối với trường Mật khẩu.
+   - Miền hợp lệ: Giá trị trùng hoàn toàn với Mật khẩu.
+   - Miền không hợp lệ: Giá trị khác Mật khẩu dù chỉ khác 1 ký tự.
+
+5. **Bối cảnh Mobile**
+   - Kiểu dữ liệu: Bối cảnh giao diện người dùng.
+   - Ràng buộc: Luồng thao tác phải thực hiện được trên màn hình di động với các trường nhập và nút hành động hiển thị rõ ràng.
+   - Miền hợp lệ: Người dùng có thể nhập đủ dữ liệu và thực hiện đăng ký thành công trên giao diện mobile.
+   - Miền không hợp lệ: Giao diện không hiển thị đủ trường bắt buộc, nút đăng ký không thao tác được, hoặc luồng điều hướng sau đăng ký không chuyển đúng trang Đăng nhập.
+
+Từ phân tích trên, logic nghiệp vụ chính cần kiểm tra là: tất cả trường bắt buộc phải được nhập đầy đủ, email phải đúng định dạng và chưa tồn tại, mật khẩu phải thỏa toàn bộ chính sách an toàn, xác nhận mật khẩu phải khớp, giao diện mobile phải cho phép thao tác đầy đủ trên thiết bị di động, và khi mọi điều kiện đều hợp lệ thì hệ thống phải chuyển người dùng tới trang Đăng nhập sau khi đăng ký thành công.
+
+### 2. DOMAIN TEST CASES TABLE
+
+| Test Case ID | Description                                                         | Input Data                                                                                                                     | Test Steps                                                                                                                                                                                                                                                                                                            | Expected Result                                                         | Actual Result | Status | Tested By | Date Tested |
+| ------------ | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | ------------- | ------ | --------- | ----------- |
+| FR-20-DT-01  | Đăng ký thành công trên giao diện mobile với toàn bộ dữ liệu hợp lệ | Họ Tên: Nguyen Van A<br>Email: fr20.dt01@test.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd<br>Bối cảnh: Mobile     | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Nhập "Nguyen Van A" vào trường Họ Tên.<br>4. Nhập "fr20.dt01@test.com" vào trường Email.<br>5. Nhập "P@ssw0rd" vào trường Mật khẩu.<br>6. Nhập "P@ssw0rd" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký".     | Đăng ký thành công và hệ thống chuyển sang trang Đăng nhập.             |               |        |           |             |
+| FR-20-DT-02  | Từ chối khi Họ Tên bị bỏ trống trên mobile                          | Họ Tên: <br>Email: fr20.dt02@test.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd<br>Bối cảnh: Mobile                 | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Để trống trường Họ Tên.<br>4. Nhập "fr20.dt02@test.com" vào trường Email.<br>5. Nhập "P@ssw0rd" vào trường Mật khẩu.<br>6. Nhập "P@ssw0rd" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký".                    | Hiển thị lỗi bắt buộc nhập Họ Tên và không cho phép gửi form.           |               |        |           |             |
+| FR-20-DT-03  | Từ chối khi Email sai định dạng do thiếu ký tự @                    | Họ Tên: Nguyen Van A<br>Email: fr20.dt03.test.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd<br>Bối cảnh: Mobile     | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Nhập "Nguyen Van A" vào trường Họ Tên.<br>4. Nhập "fr20.dt03.test.com" vào trường Email.<br>5. Nhập "P@ssw0rd" vào trường Mật khẩu.<br>6. Nhập "P@ssw0rd" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký".     | Hiển thị lỗi định dạng Email không hợp lệ và không cho phép gửi form.   |               |        |           |             |
+| FR-20-DT-04  | Từ chối khi Email đã tồn tại trong hệ thống                         | Họ Tên: Nguyen Van A<br>Email: fr20.existing@test.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rd<br>Bối cảnh: Mobile | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Nhập "Nguyen Van A" vào trường Họ Tên.<br>4. Nhập "fr20.existing@test.com" vào trường Email.<br>5. Nhập "P@ssw0rd" vào trường Mật khẩu.<br>6. Nhập "P@ssw0rd" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký". | Hiển thị lỗi Email đã được sử dụng và không cho phép tạo tài khoản mới. |               |        |           |             |
+| FR-20-DT-05  | Từ chối khi Mật khẩu chỉ có 7 ký tự                                 | Họ Tên: Nguyen Van A<br>Email: fr20.dt05@test.com<br>Mật khẩu: P@ssw0r<br>Xác nhận mật khẩu: P@ssw0r<br>Bối cảnh: Mobile       | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Nhập "Nguyen Van A" vào trường Họ Tên.<br>4. Nhập "fr20.dt05@test.com" vào trường Email.<br>5. Nhập "P@ssw0r" vào trường Mật khẩu.<br>6. Nhập "P@ssw0r" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký".       | Hiển thị lỗi Mật khẩu phải có tối thiểu 8 ký tự.                        |               |        |           |             |
+| FR-20-DT-06  | Từ chối khi Mật khẩu thiếu chữ hoa                                  | Họ Tên: Nguyen Van A<br>Email: fr20.dt06@test.com<br>Mật khẩu: p@ssw0rd<br>Xác nhận mật khẩu: p@ssw0rd<br>Bối cảnh: Mobile     | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Nhập "Nguyen Van A" vào trường Họ Tên.<br>4. Nhập "fr20.dt06@test.com" vào trường Email.<br>5. Nhập "p@ssw0rd" vào trường Mật khẩu.<br>6. Nhập "p@ssw0rd" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký".     | Hiển thị lỗi Mật khẩu phải có ít nhất 1 chữ hoa.                        |               |        |           |             |
+| FR-20-DT-07  | Từ chối khi Mật khẩu thiếu chữ thường                               | Họ Tên: Nguyen Van A<br>Email: fr20.dt07@test.com<br>Mật khẩu: P@SSW0RD<br>Xác nhận mật khẩu: P@SSW0RD<br>Bối cảnh: Mobile     | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Nhập "Nguyen Van A" vào trường Họ Tên.<br>4. Nhập "fr20.dt07@test.com" vào trường Email.<br>5. Nhập "P@SSW0RD" vào trường Mật khẩu.<br>6. Nhập "P@SSW0RD" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký".     | Hiển thị lỗi Mật khẩu phải có ít nhất 1 chữ thường.                     |               |        |           |             |
+| FR-20-DT-08  | Từ chối khi Mật khẩu thiếu chữ số                                   | Họ Tên: Nguyen Van A<br>Email: fr20.dt08@test.com<br>Mật khẩu: P@ssword<br>Xác nhận mật khẩu: P@ssword<br>Bối cảnh: Mobile     | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Nhập "Nguyen Van A" vào trường Họ Tên.<br>4. Nhập "fr20.dt08@test.com" vào trường Email.<br>5. Nhập "P@ssword" vào trường Mật khẩu.<br>6. Nhập "P@ssword" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký".     | Hiển thị lỗi Mật khẩu phải có ít nhất 1 chữ số.                         |               |        |           |             |
+| FR-20-DT-09  | Từ chối khi Mật khẩu thiếu ký tự đặc biệt                           | Họ Tên: Nguyen Van A<br>Email: fr20.dt09@test.com<br>Mật khẩu: Password1<br>Xác nhận mật khẩu: Password1<br>Bối cảnh: Mobile   | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Nhập "Nguyen Van A" vào trường Họ Tên.<br>4. Nhập "fr20.dt09@test.com" vào trường Email.<br>5. Nhập "Password1" vào trường Mật khẩu.<br>6. Nhập "Password1" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký".   | Hiển thị lỗi Mật khẩu phải có ít nhất 1 ký tự đặc biệt hợp lệ.          |               |        |           |             |
+| FR-20-DT-10  | Từ chối khi Xác nhận mật khẩu không khớp                            | Họ Tên: Nguyen Van A<br>Email: fr20.dt10@test.com<br>Mật khẩu: P@ssw0rd<br>Xác nhận mật khẩu: P@ssw0rD<br>Bối cảnh: Mobile     | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Nhập "Nguyen Van A" vào trường Họ Tên.<br>4. Nhập "fr20.dt10@test.com" vào trường Email.<br>5. Nhập "P@ssw0rd" vào trường Mật khẩu.<br>6. Nhập "P@ssw0rD" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký".     | Hiển thị lỗi Xác nhận mật khẩu không khớp với Mật khẩu.                 |               |        |           |             |
+
+## II. KỊCH BẢN KIỂM THỬ THEO KỸ THUẬT BOUNDARY VALUE ANALYSIS (BVA)
+
+### 1. DETAILED STEP-BY-STEP BOUNDARY ANALYSIS
+
+Trong FR-20, các ràng buộc có tính chất biên và có thể lượng hóa bằng số hoặc độ dài chuỗi gồm:
+
+1. **Độ dài Mật khẩu**
+   - Ràng buộc tối thiểu: 8 ký tự.
+   - Điểm biên cần xét: 7 ký tự, 8 ký tự, 9 ký tự.
+   - Tại $n = 7$, hệ thống phải từ chối vì nhỏ hơn ngưỡng tối thiểu.
+   - Tại $n = 8$, hệ thống phải chấp nhận nếu các điều kiện thành phần khác đều hợp lệ.
+   - Tại $n = 9$, hệ thống vẫn phải chấp nhận nếu các điều kiện thành phần khác đều hợp lệ.
+
+2. **Số lượng chữ hoa trong Mật khẩu**
+   - Ràng buộc tối thiểu: ít nhất 1 chữ hoa.
+   - Điểm biên cần xét: 0 chữ hoa, 1 chữ hoa, 2 chữ hoa.
+
+3. **Số lượng chữ thường trong Mật khẩu**
+   - Ràng buộc tối thiểu: ít nhất 1 chữ thường.
+   - Điểm biên cần xét: 0 chữ thường, 1 chữ thường, 2 chữ thường.
+
+4. **Số lượng chữ số trong Mật khẩu**
+   - Ràng buộc tối thiểu: ít nhất 1 chữ số.
+   - Điểm biên cần xét: 0 chữ số, 1 chữ số, 2 chữ số.
+
+5. **Số lượng ký tự đặc biệt trong Mật khẩu**
+   - Ràng buộc tối thiểu: ít nhất 1 ký tự đặc biệt thuộc tập `@`, `$`, `!`, `%`, `*`, `?`, `&`.
+   - Điểm biên cần xét: 0 ký tự đặc biệt, 1 ký tự đặc biệt, 2 ký tự đặc biệt.
+
+6. **Số lượng trường bắt buộc trên form**
+   - Ràng buộc nghiệp vụ: 4 trường bắt buộc phải được nhập đầy đủ.
+   - Điểm biên cần xét theo kiểm tra thực thi luồng: 3 trường hợp điền đủ và 1 trường bỏ trống để xác nhận hệ thống ngăn submit.
+
+Từ góc nhìn kiểm thử, các điểm 0, 1 và 2 là vùng nhạy cảm vì lỗi thường phát sinh tại ngưỡng tối thiểu: lập trình viên có thể so sánh sai điều kiện "lớn hơn" với "lớn hơn hoặc bằng", hoặc đếm sai số lượng ký tự ở đúng ngưỡng chuyển trạng thái hợp lệ. Khi kiểm tra biên của một biến, các trường bắt buộc khác trên form phải luôn được điền bằng giá trị hợp lệ để cô lập lỗi.
+
+### 2. BOUNDARY TEST CASES TABLE
+
+| Test Case ID | Description                                 | Input Data                                                                                                                                        | Test Steps                                                                                                                                                                                                                                                                                                           | Expected Result                                                                                             | Actual Result | Status | Tested By | Date Tested |
+| ------------ | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | ------------- | ------ | --------- | ----------- |
+| FR-20-BVA-01 | Kiểm tra Mật khẩu tại biên dưới với 7 ký tự | Họ Tên: Nguyen Van A<br>Email: fr20.bva01@test.com<br>Mật khẩu: P@ssw0r (7 ký tự)<br>Xác nhận mật khẩu: P@ssw0r (7 ký tự)<br>Bối cảnh: Mobile     | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Nhập "Nguyen Van A" vào trường Họ Tên.<br>4. Nhập "fr20.bva01@test.com" vào trường Email.<br>5. Nhập "P@ssw0r" vào trường Mật khẩu.<br>6. Nhập "P@ssw0r" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký".     | Hệ thống từ chối vì độ dài mật khẩu chỉ đạt 7 ký tự, nhỏ hơn ngưỡng tối thiểu 8 ký tự.                      |               |        |           |             |
+| FR-20-BVA-02 | Kiểm tra Mật khẩu tại biên với 8 ký tự      | Họ Tên: Nguyen Van A<br>Email: fr20.bva02@test.com<br>Mật khẩu: P@ssw0rd (8 ký tự)<br>Xác nhận mật khẩu: P@ssw0rd (8 ký tự)<br>Bối cảnh: Mobile   | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Nhập "Nguyen Van A" vào trường Họ Tên.<br>4. Nhập "fr20.bva02@test.com" vào trường Email.<br>5. Nhập "P@ssw0rd" vào trường Mật khẩu.<br>6. Nhập "P@ssw0rd" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký".   | Hệ thống chấp nhận vì mật khẩu đạt đúng ngưỡng tối thiểu 8 ký tự và thỏa các điều kiện thành phần bắt buộc. |               |        |           |             |
+| FR-20-BVA-03 | Kiểm tra Mật khẩu tại biên trên với 9 ký tự | Họ Tên: Nguyen Van A<br>Email: fr20.bva03@test.com<br>Mật khẩu: P@ssw0rd1 (9 ký tự)<br>Xác nhận mật khẩu: P@ssw0rd1 (9 ký tự)<br>Bối cảnh: Mobile | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Nhập "Nguyen Van A" vào trường Họ Tên.<br>4. Nhập "fr20.bva03@test.com" vào trường Email.<br>5. Nhập "P@ssw0rd1" vào trường Mật khẩu.<br>6. Nhập "P@ssw0rd1" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký". | Hệ thống chấp nhận vì mật khẩu vượt qua ngưỡng tối thiểu và vẫn thỏa toàn bộ điều kiện bảo mật.             |               |        |           |             |
