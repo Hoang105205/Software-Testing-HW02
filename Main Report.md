@@ -104,3 +104,83 @@ Từ góc nhìn kiểm thử, các điểm 0, 1 và 2 là vùng nhạy cảm vì
     - FR-01-BVA-07 (0 ký tự đặc biệt) ← trùng FR-01-DT-09
 
 - Về bản chất, kiểm tra "0 chữ hoa/thường/số/đặc biệt" là phân hoạch miền không hợp lệ (Invalid Partition) — thuộc Domain Testing, không phải BVA. AI đã xếp nhầm chúng vào BVA để đủ số lượng tối thiểu 6-9 cases theo yêu cầu trong prompt (do prompt lúc chạy Function này của em chưa đủ tối ưu), thay vì chỉ giữ 3 case biên độ dài mật khẩu thực sự thuộc BVA.
+
+# FR-10: Trạng thái Đơn hàng (Order State Machine)
+## Domain Testing
+### Giải thích
+Đối với FR-10: Trạng thái Đơn hàng (Order State Machine), các biến đầu vào và ràng buộc nghiệp vụ cần được bóc tách như sau:
+
+1. **current_state**
+   - Kiểu dữ liệu: Chuỗi ký tự đại diện cho trạng thái đơn hàng.
+   - Miền hợp lệ: `pending`, `confirmed`, `shipping`, `delivered`, `canceled`.
+   - Miền không hợp lệ: Bất kỳ giá trị nào khác 5 trạng thái trên, ví dụ `processing`, `done`, `null`, chuỗi rỗng.
+
+2. **action**
+   - Kiểu dữ liệu: Chuỗi ký tự đại diện cho hành động thực thi trên đơn hàng.
+   - Miền hợp lệ: `xác nhận`, `giao hàng`, `hoàn tất`, `hủy`.
+   - Miền không hợp lệ: Bất kỳ giá trị nào khác 4 hành động trên, ví dụ `đóng đơn`, `hoãn`, `chuyển trạng thái`.
+
+3. **actor**
+   - Kiểu dữ liệu: Chuỗi ký tự đại diện cho vai trò người thao tác.
+   - Miền hợp lệ: `Admin`, `User`.
+   - Miền không hợp lệ: Bất kỳ giá trị nào khác 2 vai trò trên, ví dụ `Guest`, `Manager`, `System`.
+
+Các quy tắc nghiệp vụ chính của sơ đồ trạng thái là:
+
+- Từ `pending`, `Admin` có thể thực hiện `xác nhận` để chuyển sang `confirmed`.
+- Từ `confirmed`, `Admin` có thể thực hiện `giao hàng` để chuyển sang `shipping`.
+- Từ `shipping`, `Admin` có thể thực hiện `hoàn tất` để chuyển sang `delivered`.
+- Từ `pending` và `confirmed`, cả `User` lẫn `Admin` đều có thể thực hiện `hủy` để chuyển sang `canceled` theo đặc tả đã cho.
+- `delivered` và `canceled` là trạng thái kết thúc, không được phép chuyển sang bất kỳ trạng thái nào khác.
+- Khi đơn hàng đã ở trạng thái `shipping`, `User` không được phép tự hủy, chỉ `Admin` mới có thể thao tác theo đặc tả ràng buộc kết thúc của nghiệp vụ.
+- Mọi chuyển đổi không hợp lệ phải trả về lỗi với thông báo phù hợp.
+
+Từ phân tích trên, miền hợp lệ là các bộ ba dữ liệu thỏa đúng trạng thái nguồn, hành động được cho phép, và vai trò có quyền thực thi. Miền không hợp lệ là mọi tổ hợp vi phạm một trong ba điều kiện trên hoặc cố gắng chuyển từ trạng thái kết thúc sang một trạng thái khác.
+
+### Domain Test Cases
+| Test Case ID | Description                                | Input Data                                                    | Test Steps                                                                                                                                                           | Expected Result                                                                    | Actual Result | Status | Tested By | Date Tested |
+| ------------ | ------------------------------------------ | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ------------- | ------ | --------- | ----------- |
+| FR-10-DT-01  | Xác nhận đơn hàng từ `pending` bởi `Admin` | current_state: pending<br>action: xác nhận<br>actor: Admin    | 1. Truy cập màn hình quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `pending`.<br>3. Chọn hành động `xác nhận`.<br>4. Thực thi thao tác với vai trò `Admin`.    | Đơn hàng chuyển từ `pending` sang `confirmed`.                                     |               |        |           |             |
+| FR-10-DT-02  | Giao hàng đơn từ `confirmed` bởi `Admin`   | current_state: confirmed<br>action: giao hàng<br>actor: Admin | 1. Truy cập màn hình quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `confirmed`.<br>3. Chọn hành động `giao hàng`.<br>4. Thực thi thao tác với vai trò `Admin`. | Đơn hàng chuyển từ `confirmed` sang `shipping`.                                    |               |        |           |             |
+| FR-10-DT-03  | Hoàn tất đơn từ `shipping` bởi `Admin`     | current_state: shipping<br>action: hoàn tất<br>actor: Admin   | 1. Truy cập màn hình quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `shipping`.<br>3. Chọn hành động `hoàn tất`.<br>4. Thực thi thao tác với vai trò `Admin`.   | Đơn hàng chuyển từ `shipping` sang `delivered`.                                    |               |        |           |             |
+| FR-10-DT-04  | Hủy đơn từ `pending` bởi `User`            | current_state: pending<br>action: hủy<br>actor: User          | 1. Truy cập màn hình quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `pending`.<br>3. Chọn hành động `hủy`.<br>4. Thực thi thao tác với vai trò `User`.          | Đơn hàng chuyển từ `pending` sang `canceled`.                                      |               |        |           |             |
+| FR-10-DT-05  | Hủy đơn từ `pending` bởi `Admin`           | current_state: pending<br>action: hủy<br>actor: Admin         | 1. Truy cập màn hình quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `pending`.<br>3. Chọn hành động `hủy`.<br>4. Thực thi thao tác với vai trò `Admin`.         | Đơn hàng chuyển từ `pending` sang `canceled`.                                      |               |        |           |             |
+| FR-10-DT-06  | Hủy đơn từ `confirmed` bởi `User`          | current_state: confirmed<br>action: hủy<br>actor: User        | 1. Truy cập màn hình quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `confirmed`.<br>3. Chọn hành động `hủy`.<br>4. Thực thi thao tác với vai trò `User`.        | Đơn hàng chuyển từ `confirmed` sang `canceled`.                                    |               |        |           |             |
+| FR-10-DT-07  | Hủy đơn từ `confirmed` bởi `Admin`         | current_state: confirmed<br>action: hủy<br>actor: Admin       | 1. Truy cập màn hình quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `confirmed`.<br>3. Chọn hành động `hủy`.<br>4. Thực thi thao tác với vai trò `Admin`.       | Đơn hàng chuyển từ `confirmed` sang `canceled`.                                    |               |        |           |             |
+| FR-10-DT-08  | User cố hủy đơn ở trạng thái `shipping`    | current_state: shipping<br>action: hủy<br>actor: User         | 1. Truy cập màn hình quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `shipping`.<br>3. Chọn hành động `hủy`.<br>4. Thực thi thao tác với vai trò `User`.         | Trả về lỗi, không cho phép `User` tự hủy đơn ở trạng thái `shipping`.              |               |        |           |             |
+| FR-10-DT-09  | Admin cố hủy đơn ở trạng thái `shipping`   | current_state: shipping<br>action: hủy<br>actor: Admin        | 1. Truy cập màn hình quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `shipping`.<br>3. Chọn hành động `hủy`.<br>4. Thực thi thao tác với vai trò `Admin`.        | Đơn hàng chuyển từ `shipping` sang `canceled`. |               |        |           |             |
+| FR-10-DT-10  | Cố xác nhận đơn đã `delivered`             | current_state: delivered<br>action: xác nhận<br>actor: Admin  | 1. Truy cập màn hình quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `delivered`.<br>3. Chọn hành động `xác nhận`.<br>4. Thực thi thao tác với vai trò `Admin`.  | Trả về lỗi vì `delivered` là trạng thái kết thúc, không được chuyển tiếp.          |               |        |           |             |
+| FR-10-DT-11  | Cố giao hàng đơn đã `canceled`             | current_state: canceled<br>action: giao hàng<br>actor: Admin  | 1. Truy cập màn hình quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `canceled`.<br>3. Chọn hành động `giao hàng`.<br>4. Thực thi thao tác với vai trò `Admin`.  | Trả về lỗi vì `canceled` là trạng thái kết thúc, không được chuyển tiếp.           |               |        |           |             |
+
+## Boundary Value Analysis
+### Giải thích
+Đối với FR-10, không có biến đầu vào nào mang tính chất số học hoặc độ dài chuỗi được đặc tả rõ để áp dụng Boundary Value Analysis theo đúng định nghĩa kỹ thuật.
+
+1. `current_state` là một biến phân loại kiểu enum với tập giá trị cố định gồm 5 trạng thái.
+2. `action` là một biến phân loại kiểu enum với tập giá trị cố định gồm 4 hành động.
+3. `actor` là một biến phân loại kiểu enum với tập giá trị cố định gồm 2 vai trò.
+4. Sơ đồ chuyển đổi trạng thái là bài toán logic trạng thái, không phải bài toán có biên số học hay biên độ dài để kiểm tra theo kiểu `Boundary`, `Boundary - 1`, `Boundary + 1`.
+5. Theo quy tắc biên phạm vi nghiêm ngặt của skill, BVA chỉ được áp dụng cho ràng buộc số/độ dài được đặc tả rõ ràng. FR-10 không có ràng buộc như vậy.
+
+Kết luận kiểm thử biên: BVA không áp dụng cho FR-10. Bộ kiểm thử có giá trị thực tế đã được bao phủ đầy đủ bởi Domain Testing ở phần trên.
+
+### Boundary Test Cases
+BVA không áp dụng cho FR-10 vì không có ràng buộc số học hoặc độ dài được đặc tả.
+
+## AI Gap Analysis
+1. DT-09 hiểu sai spec — Admin hủy từ shipping bị đánh sai Expected Result
+- Đây là lỗi do từ mô tả chức năng (spec). Trong spec của FR-10, trong sơ đồ chuyển đổi trạng thái, từ `shipping`, `Admin` chỉ có action `hoàn tất` để chuyển sang `delivered`, không có đường mũi tên nào cho phép `Admin` hủy từ trạng thái `shipping`. 
+```text
+                 [Admin xác nhận]          [Admin giao hàng]      [Admin hoàn tất]
+  ┌──────────┐ ─────────────────► ┌───────────┐ ──────────────► ┌──────────┐ ──────────► ┌───────────┐
+  │ pending  │                    │ confirmed │                  │ shipping │             │ delivered │
+  └──────────┘                    └───────────┘                  └──────────┘             └───────────┘
+       │                               │
+       │ [User/Admin hủy]              │ [User/Admin hủy]
+       ▼                               ▼
+  ┌──────────┐                    ┌──────────┐
+  │ canceled │                    │ canceled │
+  └──────────┘                    └──────────┘
+```
+- Tuy nhiên, ở phần mô tả bên dưới lại có **"Khi đơn hàng đã ở trạng thái shipping, User không được phép tự hủy — chỉ Admin mới có thể thao tác."** -> Thực chất `Admin` có thể hủy từ `shipping`.
+- Chính sự mâu thuẫn này trong spec đã dẫn đến việc AI tạo ra test case FR-10-DT-09 với Expected Result sai. 

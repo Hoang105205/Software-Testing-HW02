@@ -556,3 +556,237 @@ Từ góc nhìn kiểm thử, các điểm 0, 1 và 2 là vùng nhạy cảm vì
 | FR-01-BVA-05 | Kiểm tra Mật khẩu với 0 chữ thường          | Họ Tên: Nguyen Van A<br>Email: fr01.bva05@test.com<br>Mật khẩu: P@SSW0RD (8 ký tự, 0 chữ thường)<br>Xác nhận mật khẩu: P@SSW0RD (8 ký tự)     | 1. Truy cập trang Đăng ký tài khoản.<br>2. Nhập "Nguyen Van A" vào trường Họ Tên.<br>3. Nhập "fr01.bva05@test.com" vào trường Email.<br>4. Nhập "P@SSW0RD" vào trường Mật khẩu.<br>5. Nhập "P@SSW0RD" vào trường Xác nhận mật khẩu.<br>6. Nhấn nút "Đăng ký".   | Hệ thống từ chối vì số lượng chữ thường trong mật khẩu bằng 0, chưa đạt ngưỡng tối thiểu 1.                 |               |        |           |             |
 | FR-01-BVA-06 | Kiểm tra Mật khẩu với 0 chữ số              | Họ Tên: Nguyen Van A<br>Email: fr01.bva06@test.com<br>Mật khẩu: P@ssword (8 ký tự, 0 chữ số)<br>Xác nhận mật khẩu: P@ssword (8 ký tự)         | 1. Truy cập trang Đăng ký tài khoản.<br>2. Nhập "Nguyen Van A" vào trường Họ Tên.<br>3. Nhập "fr01.bva06@test.com" vào trường Email.<br>4. Nhập "P@ssword" vào trường Mật khẩu.<br>5. Nhập "P@ssword" vào trường Xác nhận mật khẩu.<br>6. Nhấn nút "Đăng ký".   | Hệ thống từ chối vì số lượng chữ số trong mật khẩu bằng 0, chưa đạt ngưỡng tối thiểu 1.                     |               |        |           |             |
 | FR-01-BVA-07 | Kiểm tra Mật khẩu với 0 ký tự đặc biệt      | Họ Tên: Nguyen Van A<br>Email: fr01.bva07@test.com<br>Mật khẩu: Passw0rd (8 ký tự, 0 ký tự đặc biệt)<br>Xác nhận mật khẩu: Passw0rd (8 ký tự) | 1. Truy cập trang Đăng ký tài khoản.<br>2. Nhập "Nguyen Van A" vào trường Họ Tên.<br>3. Nhập "fr01.bva07@test.com" vào trường Email.<br>4. Nhập "Passw0rd" vào trường Mật khẩu.<br>5. Nhập "Passw0rd" vào trường Xác nhận mật khẩu.<br>6. Nhấn nút "Đăng ký".   | Hệ thống từ chối vì số lượng ký tự đặc biệt trong mật khẩu bằng 0, chưa đạt ngưỡng tối thiểu 1.             |               |        |           |             |
+
+## Entry 12
+### AI tool name
+
+- GPT-5.4 mini
+
+### Date and time
+
+- 2026-06-20 12:04:50
+
+### Prompt
+
+- **System Core Blueprint (Full Verbatim Content):**
+
+  # ROLE DEFINITION & SYSTEM BLUEPRINT
+
+  You operate as an Advanced Automated Test Design Pipeline Engine. You seamlessly consolidate the professional capabilities of 4 specialized personas: an expert Business Analyst, an ISTQB Senior QA Engineer specializing in Equivalence Partitioning, an ISTQB Senior QA Engineer specializing in Boundary Value Analysis (BVA), and a meticulous Technical Writer.
+
+  Your ultimate objective is to ingest the raw Feature Specification provided by the user, execute sequential mathematical and logical analysis, and output isolated, distinct file artifacts. Each artifact must be prefixed with a dedicated File Tag to prevent any data overwrite in the workspace.
+
+  ***
+
+  # DETAILED EXECUTION WORKFLOW
+
+  ## PHASE 1: SPECIFICATION ANALYSIS (BUSINESS ANALYST ROLE)
+
+  Analyze the provided feature specification deeply. Extract and organize the following components. **CRITICAL: This entire analysis section must be written in Vietnamese.**
+  1. List of Input Variables (Danh sách các biến đầu vào).
+  2. Detailed Constraints and Datatypes for each variable, including min/max lengths, allowed character sets, etc. (Kiểu dữ liệu và Ràng buộc chi tiết).
+  3. Core Business Rules and implicit logical dependencies affecting system outcomes (Quy tắc nghiệp vụ và logic ngầm).
+
+  ## PHASE 2: DOMAIN TESTING DESIGN (EQUIVALENCE PARTITIONING ROLE)
+
+  Apply Equivalence Partitioning and Combinatorial Testing techniques to achieve maximum test coverage.
+  1. **Thought Process Explanation:** Provide a detailed, step-by-step reasoning breakdown **in Vietnamese**, clearly identifying all Valid Partitions (Miền hợp lệ) and Invalid Partitions (Miền không hợp lệ) for EACH input variable.
+  2. **Anti-Laziness Test Generation Rules:**
+     - Minimum Test Cases: You must generate **at least 8 to 12 distinct test cases** for a standard form feature.
+     - Constraint Decomposition Strategy: For any input field with multiple complex, nested validation constraints, apply "Single Negative Fault Isolation" (isolate and test one negative condition at a time while keeping other fields valid).
+     - Test Case ID format: Must start with `FR-XX-DT-01`, `FR-XX-DT-02`, etc. (where XX is the feature number, e.g., FR-01).
+
+  ## PHASE 3: BOUNDARY VALUE ANALYSIS DESIGN (BVA ROLE)
+
+  Apply Boundary Value Analysis exclusively to variables with numeric or boundary-length constraints (e.g., string length, numeric range). DO NOT apply BVA to qualitative structural variables like Email format.
+  1. **Thought Process Explanation:** Provide a detailed mathematical breakdown **in Vietnamese** to identify sensitive boundary points: `Boundary`, `Boundary - 1`, `Boundary + 1` (for both MIN and MAX limits). Explain from a QA perspective why these exact points are highly error-prone.
+  2. **Anti-Laziness Test Generation Rules:**
+     - Minimum Test Cases: You must generate **distinct boundary test cases** that cover the critical boundary values.
+     - Multi-variable Boundaries: Scan and identify ALL numeric/length-based variables in the specification. Perform individual boundary testing for EACH identified variable.
+     - Variable Isolation Rule: When evaluating the boundary points of a specific variable, all other mandatory fields on the form MUST be populated with standard VALID values to isolate the defect behavior.
+     - Test Case ID format: Must start with `FR-XX-BVA-01`, `FR-XX-BVA-02`, etc.
+     - **CRITICAL BOUNDARY SCOPE RULE:** Only apply BVA to constraints explicitly defined in the specification. DO NOT infer or assume min/max values for fields that have no numeric constraints stated in the spec.
+
+  ## PHASE 4: AUDIT LOG COMPILATION (AUDIT LOGGER ROLE)
+
+  Gather system execution states to create an audit trail. This includes:
+  - The model name currently executing this skill.
+  - Execution timestamp.
+  - The exact raw feature specification supplied by the user.
+  - **The full verbatim content of this skill's system prompt** — copy and paste
+    the entire text of this skill file (from ROLE DEFINITION to end of OUTPUT
+    SPECIFICATION) into the audit log as plain text evidence.
+
+  ***
+
+  # MANDATORY DATA & FORMATTING RULES (ANTI-LAZINESS)
+  1. **Concrete Test Data:** All test case tables **MUST** contain explicit, literal test values (e.g., "Nguyen Van A", "abc@gmail.com", a string of exactly 51 characters). DO NOT use generic descriptions like "Enter valid email" or "Too long string".
+  2. **Strict Markdown Table Structure:** All test scenarios must be mapped exactly into the following columnar schema:
+     `| Test Case ID | Description | Input Data | Test Steps | Expected Result | Actual Result | Status | Tested By | Date Tested |`
+  3. **The [Input Data] Cell Rule:** Provide the full data payload required to execute the test. Each field must occupy its own line, separated explicitly by a `<br>` tag. For BVA test cases, state the exact length or numeric value next to the targeted variable to prove mathematical boundary compliance.
+  4. **The [Test Steps] Cell Rule:** DO NOT write generic steps like "Submit form". Write step-by-step UI interaction workflows, specifying which field receives what value from the Input Data column. Separate steps using `<br>` tags.
+     - _Compliant Example:_ `1. Truy cập trang đăng ký.<br>2. Nhập chuỗi "Hoang105" vào trường Họ Tên, nhập "test@gmail.com" vào trường Email.<br>3. Nhấn nút "Đăng ký".`
+  5. **Preserve `<br>` Tags:** Retain all `<br>` formatting tags inside the markdown tables. Do not remove them or convert them into physical line breaks, ensuring the IDE preview renders the layout properly.
+
+  ***
+
+  # STRICT OUTPUT SPECIFICATION (TECHNICAL WRITER OUTPUT)
+
+  You must assemble and package the outcomes into **two distinct text blocks representing separate files**. Each text block MUST start with a specific file tag identifier format: `[File: FRXX_filename.md]` (Replace `FRXX` with the actual functional requirement ID, e.g., `FR01`).
+
+  **CRITICAL LANGUAGE CONSTRAINT:** Every component inside the file blocks (including headers, analytical explanations, step-by-step reasoning, and table cell contents) **MUST BE WRITTEN ENTIRELY IN VIETNAMESE** to fulfill project localization requirements. Do not summarize, truncate, or use ellipses (...) to hide test cases.
+
+  Your output blueprint must strictly match the following structure:
+
+  ***
+
+  [File: FRXX_main_report.md]
+
+  # BÁO CÁO KẾT QUẢ THIẾT KẾ KỊCH BẢN KIỂM THỬ
+
+  ## I. KỊCH BẢN KIỂM THỬ THEO KỸ THUẬT DOMAIN TESTING
+
+  ### 1. DETAILED STEP-BY-STEP DOMAIN ANALYSIS
+
+  (Chèn toàn bộ phần giải trình tư duy phân tích các miền tương đương Hợp lệ/Không hợp lệ chi tiết bằng tiếng Việt tại đây)
+
+  ### 2. DOMAIN TEST CASES TABLE
+
+  (Chèn bảng test cases đầy đủ từ 8-12 kịch bản trở lên, định dạng chuẩn có chứa thẻ <br> trong các ô dữ liệu)
+
+  ## II. KỊCH BẢN KIỂM THỬ THEO KỸ THUẬT BOUNDARY VALUE ANALYSIS (BVA)
+
+  ### 1. DETAILED STEP-BY-STEP BOUNDARY ANALYSIS
+
+  (Chèn toàn bộ phần giải trình tư duy phân tích toán học các điểm biên Boundary, Boundary-1, Boundary+1 chi tiết bằng tiếng Việt tại đây)
+
+  ### 2. BOUNDARY TEST CASES TABLE
+
+  (Chèn bảng test cases biên đầy đủ từ 6-9 kịch bản trở lên, định dạng chuẩn có chứa thẻ <br> trong các ô dữ liệu)
+
+  ***
+
+  [File: FRXX_AI_Audit_Log.md]
+
+  # AI AUDIT REPORT (DỮ LIỆU KIỂM TOÁN HỆ THỐNG)
+
+  ### AI tool name
+  - [Tên model đang thực thi skill này]
+
+  ### Date and time
+  - [Điền ngày giờ chạy thực tế tại đây]
+
+  ### Prompt
+  - **System Core Blueprint (Full Verbatim Content):**
+
+    (Chèn toàn bộ nguyên văn nội dung của file skill này vào đây,
+    từ dòng ROLE DEFINITION đến hết OUTPUT SPECIFICATION,
+    để làm bằng chứng kiểm toán đầy đủ)
+
+  - **Input Feature Specification Used:**
+
+    (Chèn lại nguyên văn toàn bộ nội dung tài liệu Spec thô
+    ban đầu của người dùng vào đây)
+
+  ### The AI output
+
+  (Chèn toàn bộ nội dung đã sinh ra từ PHASE 2 và PHASE 3 vào đây —
+  bao gồm phần giải trình Domain Testing, bảng DT test cases,
+  phần giải trình BVA, và bảng BVA test cases.
+  KHÔNG được viết link tham chiếu ra file khác.)
+
+- **Input Feature Specification Used:**
+
+  FR-10: Trạng thái Đơn hàng (Order State Machine)
+  - Đơn hàng có 5 trạng thái và phải tuân theo sơ đồ chuyển đổi sau:
+    [Admin xác nhận] [Admin giao hàng] [Admin hoàn tất]
+    ┌──────────┐ ─────────────────► ┌───────────┐ ──────────────► ┌──────────┐ ──────────► ┌───────────┐
+    │ pending │ │ confirmed │ │ shipping │ │ delivered │
+    └──────────┘ └───────────┘ └──────────┘ └───────────┘
+    │ │
+    │ [User/Admin hủy] │ [User/Admin hủy]
+    ▼ ▼
+    ┌──────────┐ ┌──────────┐
+    │ canceled │ │ canceled │
+    └──────────┘ └──────────┘
+
+  - Ràng buộc trạng thái kết thúc (Final States):
+  * Trạng thái `delivered` và `canceled` là trạng thái kết thúc — không được phép chuyển sang bất kỳ trạng thái nào khác.
+  * Khi đơn hàng đã ở trạng thái `shipping`, User không được phép tự hủy — chỉ Admin mới có thể thao tác.
+  * Mọi chuyển đổi không hợp lệ phải trả về lỗi với thông báo phù hợp.
+
+### The AI output
+
+[File: FR10_main_report.md]
+
+# BÁO CÁO KẾT QUẢ THIẾT KẾ KỊCH BẢN KIỂM THỬ
+
+## I. KỊCH BẢN KIỂM THỬ THEO KỸ THUẬT DOMAIN TESTING
+
+### 1. DETAILED STEP-BY-STEP DOMAIN ANALYSIS
+
+Đối với FR-10: Trạng thái Đơn hàng (Order State Machine), các biến đầu vào và ràng buộc nghiệp vụ cần được bóc tách như sau:
+
+1. **current_state**
+   - Kiểu dữ liệu: Chuỗi ký tự đại diện cho trạng thái đơn hàng.
+   - Miền hợp lệ: `pending`, `confirmed`, `shipping`, `delivered`, `canceled`.
+   - Miền không hợp lệ: Bất kỳ giá trị nào khác 5 trạng thái trên, ví dụ `processing`, `done`, `null`, chuỗi rỗng.
+
+2. **action**
+   - Kiểu dữ liệu: Chuỗi ký tự đại diện cho hành động thực thi trên đơn hàng.
+   - Miền hợp lệ: `xác nhận`, `giao hàng`, `hoàn tất`, `hủy`.
+   - Miền không hợp lệ: Bất kỳ giá trị nào khác 4 hành động trên, ví dụ `đóng đơn`, `hoãn`, `chuyển trạng thái`.
+
+3. **actor**
+   - Kiểu dữ liệu: Chuỗi ký tự đại diện cho vai trò người thao tác.
+   - Miền hợp lệ: `Admin`, `User`.
+   - Miền không hợp lệ: Bất kỳ giá trị nào khác 2 vai trò trên, ví dụ `Guest`, `Manager`, `System`.
+
+Các quy tắc nghiệp vụ chính của sơ đồ trạng thái là:
+
+- Từ `pending`, `Admin` có thể thực hiện `xác nhận` để chuyển sang `confirmed`.
+- Từ `confirmed`, `Admin` có thể thực hiện `giao hàng` để chuyển sang `shipping`.
+- Từ `shipping`, `Admin` có thể thực hiện `hoàn tất` để chuyển sang `delivered`.
+- Từ `pending` và `confirmed`, cả `User` lẫn `Admin` đều có thể thực hiện `hủy` để chuyển sang `canceled` theo đặc tả đã cho.
+- `delivered` và `canceled` là trạng thái kết thúc, không được phép chuyển sang bất kỳ trạng thái nào khác.
+- Khi đơn hàng đã ở trạng thái `shipping`, `User` không được phép tự hủy, chỉ `Admin` mới có thể thao tác theo đặc tả ràng buộc kết thúc của nghiệp vụ.
+- Mọi chuyển đổi không hợp lệ phải trả về lỗi với thông báo phù hợp.
+
+Từ phân tích trên, miền hợp lệ là các bộ ba dữ liệu thỏa đúng trạng thái nguồn, hành động được cho phép, và vai trò có quyền thực thi. Miền không hợp lệ là mọi tổ hợp vi phạm một trong ba điều kiện trên hoặc cố gắng chuyển từ trạng thái kết thúc sang một trạng thái khác.
+
+### 2. DOMAIN TEST CASES TABLE
+
+| Test Case ID | Description                                | Input Data                                                    | Test Steps                                                                                                                                                           | Expected Result                                                                    | Actual Result | Status | Tested By | Date Tested |
+| ------------ | ------------------------------------------ | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ------------- | ------ | --------- | ----------- |
+| FR-10-DT-01  | Xác nhận đơn hàng từ `pending` bởi `Admin` | current_state: pending<br>action: xác nhận<br>actor: Admin    | 1. Truy cập màn hình quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `pending`.<br>3. Chọn hành động `xác nhận`.<br>4. Thực thi thao tác với vai trò `Admin`.    | Đơn hàng chuyển từ `pending` sang `confirmed`.                                     |               |        |           |             |
+| FR-10-DT-02  | Giao hàng đơn từ `confirmed` bởi `Admin`   | current_state: confirmed<br>action: giao hàng<br>actor: Admin | 1. Truy cập màn hình quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `confirmed`.<br>3. Chọn hành động `giao hàng`.<br>4. Thực thi thao tác với vai trò `Admin`. | Đơn hàng chuyển từ `confirmed` sang `shipping`.                                    |               |        |           |             |
+| FR-10-DT-03  | Hoàn tất đơn từ `shipping` bởi `Admin`     | current_state: shipping<br>action: hoàn tất<br>actor: Admin   | 1. Truy cập màn hình quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `shipping`.<br>3. Chọn hành động `hoàn tất`.<br>4. Thực thi thao tác với vai trò `Admin`.   | Đơn hàng chuyển từ `shipping` sang `delivered`.                                    |               |        |           |             |
+| FR-10-DT-04  | Hủy đơn từ `pending` bởi `User`            | current_state: pending<br>action: hủy<br>actor: User          | 1. Truy cập màn hình quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `pending`.<br>3. Chọn hành động `hủy`.<br>4. Thực thi thao tác với vai trò `User`.          | Đơn hàng chuyển từ `pending` sang `canceled`.                                      |               |        |           |             |
+| FR-10-DT-05  | Hủy đơn từ `pending` bởi `Admin`           | current_state: pending<br>action: hủy<br>actor: Admin         | 1. Truy cập màn hình quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `pending`.<br>3. Chọn hành động `hủy`.<br>4. Thực thi thao tác với vai trò `Admin`.         | Đơn hàng chuyển từ `pending` sang `canceled`.                                      |               |        |           |             |
+| FR-10-DT-06  | Hủy đơn từ `confirmed` bởi `User`          | current_state: confirmed<br>action: hủy<br>actor: User        | 1. Truy cập màn hình quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `confirmed`.<br>3. Chọn hành động `hủy`.<br>4. Thực thi thao tác với vai trò `User`.        | Đơn hàng chuyển từ `confirmed` sang `canceled`.                                    |               |        |           |             |
+| FR-10-DT-07  | Hủy đơn từ `confirmed` bởi `Admin`         | current_state: confirmed<br>action: hủy<br>actor: Admin       | 1. Truy cập màn hình quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `confirmed`.<br>3. Chọn hành động `hủy`.<br>4. Thực thi thao tác với vai trò `Admin`.       | Đơn hàng chuyển từ `confirmed` sang `canceled`.                                    |               |        |           |             |
+| FR-10-DT-08  | User cố hủy đơn ở trạng thái `shipping`    | current_state: shipping<br>action: hủy<br>actor: User         | 1. Truy cập màn hình quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `shipping`.<br>3. Chọn hành động `hủy`.<br>4. Thực thi thao tác với vai trò `User`.         | Trả về lỗi, không cho phép `User` tự hủy đơn ở trạng thái `shipping`.              |               |        |           |             |
+| FR-10-DT-09  | Admin cố hủy đơn ở trạng thái `shipping`   | current_state: shipping<br>action: hủy<br>actor: Admin        | 1. Truy cập màn hình quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `shipping`.<br>3. Chọn hành động `hủy`.<br>4. Thực thi thao tác với vai trò `Admin`.        | Trả về lỗi vì luồng trạng thái không cho phép hủy từ `shipping` theo sơ đồ đã cho. |               |        |           |             |
+| FR-10-DT-10  | Cố xác nhận đơn đã `delivered`             | current_state: delivered<br>action: xác nhận<br>actor: Admin  | 1. Truy cập màn hình quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `delivered`.<br>3. Chọn hành động `xác nhận`.<br>4. Thực thi thao tác với vai trò `Admin`.  | Trả về lỗi vì `delivered` là trạng thái kết thúc, không được chuyển tiếp.          |               |        |           |             |
+| FR-10-DT-11  | Cố giao hàng đơn đã `canceled`             | current_state: canceled<br>action: giao hàng<br>actor: Admin  | 1. Truy cập màn hình quản lý đơn hàng.<br>2. Chọn đơn hàng có trạng thái `canceled`.<br>3. Chọn hành động `giao hàng`.<br>4. Thực thi thao tác với vai trò `Admin`.  | Trả về lỗi vì `canceled` là trạng thái kết thúc, không được chuyển tiếp.           |               |        |           |             |
+
+## II. KỊCH BẢN KIỂM THỬ THEO KỸ THUẬT BOUNDARY VALUE ANALYSIS (BVA)
+
+### 1. DETAILED STEP-BY-STEP BOUNDARY ANALYSIS
+
+Đối với FR-10, không có biến đầu vào nào mang tính chất số học hoặc độ dài chuỗi được đặc tả rõ để áp dụng Boundary Value Analysis theo đúng định nghĩa kỹ thuật.
+
+1. `current_state` là một biến phân loại kiểu enum với tập giá trị cố định gồm 5 trạng thái.
+2. `action` là một biến phân loại kiểu enum với tập giá trị cố định gồm 4 hành động.
+3. `actor` là một biến phân loại kiểu enum với tập giá trị cố định gồm 2 vai trò.
+4. Sơ đồ chuyển đổi trạng thái là bài toán logic trạng thái, không phải bài toán có biên số học hay biên độ dài để kiểm tra theo kiểu `Boundary`, `Boundary - 1`, `Boundary + 1`.
+5. Theo quy tắc biên phạm vi nghiêm ngặt của skill, BVA chỉ được áp dụng cho ràng buộc số/độ dài được đặc tả rõ ràng. FR-10 không có ràng buộc như vậy.
+
+Kết luận kiểm thử biên: BVA không áp dụng cho FR-10. Bộ kiểm thử có giá trị thực tế đã được bao phủ đầy đủ bởi Domain Testing ở phần trên.
+
+### 2. BOUNDARY TEST CASES TABLE
+
+| Test Case ID | Description                 | Input Data                                                 | Test Steps                                                                                                                                                                                      | Expected Result                                                                            | Actual Result | Status | Tested By | Date Tested |
+| ------------ | --------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------- | ------ | --------- | ----------- |
+| FR-10-BVA-01 | Không áp dụng BVA cho FR-10 | current_state: pending<br>action: xác nhận<br>actor: Admin | 1. Đối chiếu đặc tả FR-10 để xác định biến đầu vào có ràng buộc số học/độ dài hay không.<br>2. Xác nhận các biến chỉ là trạng thái, hành động và vai trò dạng enum.<br>3. Kết luận phạm vi BVA. | Ghi nhận BVA không áp dụng cho FR-10 vì không có ràng buộc số học hoặc độ dài được đặc tả. |               |        |           |             |
+
