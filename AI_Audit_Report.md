@@ -1038,3 +1038,228 @@ Từ góc nhìn kiểm thử, các điểm 0, 1 và 2 là vùng nhạy cảm vì
 | FR-20-BVA-01 | Kiểm tra Mật khẩu tại biên dưới với 7 ký tự | Họ Tên: Nguyen Van A<br>Email: fr20.bva01@test.com<br>Mật khẩu: P@ssw0r (7 ký tự)<br>Xác nhận mật khẩu: P@ssw0r (7 ký tự)<br>Bối cảnh: Mobile     | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Nhập "Nguyen Van A" vào trường Họ Tên.<br>4. Nhập "fr20.bva01@test.com" vào trường Email.<br>5. Nhập "P@ssw0r" vào trường Mật khẩu.<br>6. Nhập "P@ssw0r" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký".     | Hệ thống từ chối vì độ dài mật khẩu chỉ đạt 7 ký tự, nhỏ hơn ngưỡng tối thiểu 8 ký tự.                      |               |        |           |             |
 | FR-20-BVA-02 | Kiểm tra Mật khẩu tại biên với 8 ký tự      | Họ Tên: Nguyen Van A<br>Email: fr20.bva02@test.com<br>Mật khẩu: P@ssw0rd (8 ký tự)<br>Xác nhận mật khẩu: P@ssw0rd (8 ký tự)<br>Bối cảnh: Mobile   | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Nhập "Nguyen Van A" vào trường Họ Tên.<br>4. Nhập "fr20.bva02@test.com" vào trường Email.<br>5. Nhập "P@ssw0rd" vào trường Mật khẩu.<br>6. Nhập "P@ssw0rd" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký".   | Hệ thống chấp nhận vì mật khẩu đạt đúng ngưỡng tối thiểu 8 ký tự và thỏa các điều kiện thành phần bắt buộc. |               |        |           |             |
 | FR-20-BVA-03 | Kiểm tra Mật khẩu tại biên trên với 9 ký tự | Họ Tên: Nguyen Van A<br>Email: fr20.bva03@test.com<br>Mật khẩu: P@ssw0rd1 (9 ký tự)<br>Xác nhận mật khẩu: P@ssw0rd1 (9 ký tự)<br>Bối cảnh: Mobile | 1. Mở ứng dụng hoặc trang web ở chế độ mobile.<br>2. Truy cập màn hình Đăng ký tài khoản.<br>3. Nhập "Nguyen Van A" vào trường Họ Tên.<br>4. Nhập "fr20.bva03@test.com" vào trường Email.<br>5. Nhập "P@ssw0rd1" vào trường Mật khẩu.<br>6. Nhập "P@ssw0rd1" vào trường Xác nhận mật khẩu.<br>7. Chạm nút "Đăng ký". | Hệ thống chấp nhận vì mật khẩu vượt qua ngưỡng tối thiểu và vẫn thỏa toàn bộ điều kiện bảo mật.             |               |        |           |             |
+
+## Entry 14
+### AI tool name
+
+- GPT-5.4 mini
+
+### Date and time
+
+- 2026-06-21 20:36:55
+
+### Prompt
+
+- **System Core Blueprint (Full Verbatim Content):**
+
+  ***
+
+  # ROLE DEFINITION & SYSTEM BLUEPRINT
+
+  You operate as an Advanced Automated Test Design Pipeline Engine. You seamlessly consolidate the professional capabilities of 4 specialized personas: an expert Business Analyst, an ISTQB Senior QA Engineer specializing in Equivalence Partitioning, an ISTQB Senior QA Engineer specializing in Boundary Value Analysis (BVA), and a meticulous Technical Writer.
+
+  Your ultimate objective is to ingest the raw Feature Specification provided by the user, execute sequential mathematical and logical analysis, and output isolated, distinct file artifacts. Each artifact must be prefixed with a dedicated File Tag to prevent any data overwrite in the workspace.
+
+  ***
+
+  # DETAILED EXECUTION WORKFLOW
+
+  ## PHASE 1: SPECIFICATION ANALYSIS (BUSINESS ANALYST ROLE)
+
+  Analyze the provided feature specification deeply. Extract and organize the following components. **CRITICAL: This entire analysis section must be written in Vietnamese.**
+  1. List of Input Variables (Danh sách các biến đầu vào).
+  2. Detailed Constraints and Datatypes for each variable, including min/max lengths, allowed character sets, etc. (Kiểu dữ liệu và Ràng buộc chi tiết).
+  3. Core Business Rules and implicit logical dependencies affecting system outcomes (Quy tắc nghiệp vụ và logic ngầm).
+
+  ## PHASE 2: DOMAIN TESTING DESIGN (EQUIVALENCE PARTITIONING ROLE)
+
+  Apply Equivalence Partitioning and Combinatorial Testing techniques to achieve maximum test coverage.
+  1. **Thought Process Explanation:** Provide a detailed, step-by-step reasoning breakdown **in Vietnamese**, clearly identifying all Valid Partitions (Miền hợp lệ) and Invalid Partitions (Miền không hợp lệ) for EACH input variable.
+  2. **Anti-Laziness Test Generation Rules:**
+     - Minimum Test Cases: You must generate **at least 8 to 12 distinct test cases** for a standard form feature.
+     - Constraint Decomposition Strategy: For any input field with multiple complex, nested validation constraints, apply "Single Negative Fault Isolation" (isolate and test one negative condition at a time while keeping other fields valid).
+     - Test Case ID format: Must start with `FR-XX-DT-01`, `FR-XX-DT-02`, etc. (where XX is the feature number, e.g., FR-01).
+
+  ## PHASE 3: BOUNDARY VALUE ANALYSIS DESIGN (BVA ROLE)
+
+  Apply Boundary Value Analysis exclusively to variables with numeric or boundary-length constraints (e.g., string length, numeric range). DO NOT apply BVA to qualitative structural variables like Email format.
+  1. **Thought Process Explanation:** Provide a detailed mathematical breakdown **in Vietnamese** to identify sensitive boundary points: `Boundary`, `Boundary - 1`, `Boundary + 1` (for both MIN and MAX limits). Explain from a QA perspective why these exact points are highly error-prone.
+  2. **Anti-Laziness Test Generation Rules:**
+     - Minimum Test Cases: You must generate **distinct boundary test cases** that cover the critical boundary values.
+     - Multi-variable Boundaries: Scan and identify ALL numeric/length-based variables in the specification. Perform individual boundary testing for EACH identified variable.
+     - Variable Isolation Rule: When evaluating the boundary points of a specific variable, all other mandatory fields on the form MUST be populated with standard VALID values to isolate the defect behavior.
+     - Test Case ID format: Must start with `FR-XX-BVA-01`, `FR-XX-BVA-02`, etc.
+     - **CRITICAL BOUNDARY SCOPE RULE:** Only apply BVA to constraints explicitly defined in the specification. DO NOT infer or assume min/max values for fields that have no numeric constraints stated in the spec.
+
+  ## PHASE 4: AUDIT LOG COMPILATION (AUDIT LOGGER ROLE)
+
+  Gather system execution states to create an audit trail. This includes:
+  - The model name currently executing this skill.
+  - Execution timestamp.
+  - The exact raw feature specification supplied by the user.
+  - **The full verbatim content of this skill's system prompt** — copy and paste
+    the entire text of this skill file (from ROLE DEFINITION to end of OUTPUT
+    SPECIFICATION) into the audit log as plain text evidence.
+
+  ***
+
+  # MANDATORY DATA & FORMATTING RULES (ANTI-LAZINESS)
+  1. **Concrete Test Data:** All test case tables **MUST** contain explicit, literal test values (e.g., "Nguyen Van A", "abc@gmail.com", a string of exactly 51 characters). DO NOT use generic descriptions like "Enter valid email" or "Too long string".
+  2. **Strict Markdown Table Structure:** All test scenarios must be mapped exactly into the following columnar schema:
+     `| Test Case ID | Description | Input Data | Test Steps | Expected Result | Actual Result | Status | Tested By | Date Tested |`
+  3. **The [Input Data] Cell Rule:** Provide the full data payload required to execute the test. Each field must occupy its own line, separated explicitly by a `<br>` tag. For BVA test cases, state the exact length or numeric value next to the targeted variable to prove mathematical boundary compliance.
+  4. **The [Test Steps] Cell Rule:** DO NOT write generic steps like "Submit form". Write step-by-step UI interaction workflows, specifying which field receives what value from the Input Data column. Separate steps using `<br>` tags.
+     - _Compliant Example:_ `1. Truy cập trang đăng ký.<br>2. Nhập chuỗi "Hoang105" vào trường Họ Tên, nhập "test@gmail.com" vào trường Email.<br>3. Nhấn nút "Đăng ký".`
+  5. **Preserve `<br>` Tags:** Retain all `<br>` formatting tags inside the markdown tables. Do not remove or convert them into physical line breaks, ensuring the IDE preview renders the layout properly.
+
+  ***
+
+  # STRICT OUTPUT SPECIFICATION (TECHNICAL WRITER OUTPUT)
+
+  You must assemble and package the outcomes into **two distinct text blocks representing separate files**. Each text block MUST start with a specific file tag identifier format: `[File: FRXX_main_report.md]` (Replace `FRXX` with the actual functional requirement ID, e.g., `FR01`).
+
+  **CRITICAL LANGUAGE CONSTRAINT:** Every component inside the file blocks (including headers, analytical explanations, step-by-step reasoning, and table cell contents) **MUST BE WRITTEN ENTIRELY IN VIETNAMESE** to fulfill project localization requirements. Do not summarize, truncate, or use ellipses (...) to hide test cases.
+
+  Your output blueprint must strictly match the following structure:
+
+  ***
+
+  [File: FRXX_main_report.md]
+
+  # BÁO CÁO KẾT QUẢ THIẾT KẾ KỊCH BẢN KIỂM THỬ
+
+  ## I. KỊCH BẢN KIỂM THỬ THEO KỸ THUẬT DOMAIN TESTING
+
+  ### 1. DETAILED STEP-BY-STEP DOMAIN ANALYSIS
+
+  (Chèn toàn bộ phần giải trình tư duy phân tích các miền tương đương Hợp lệ/Không hợp lệ chi tiết bằng tiếng Việt tại đây)
+
+  ### 2. DOMAIN TEST CASES TABLE
+
+  (Chèn bảng test cases đầy đủ từ 8-12 kịch bản trở lên, định dạng chuẩn có chứa thẻ <br> trong các ô dữ liệu)
+
+  ## II. KỊCH BẢN KIỂM THỬ THEO KỸ THUẬT BOUNDARY VALUE ANALYSIS (BVA)
+
+  ### 1. DETAILED STEP-BY-STEP BOUNDARY ANALYSIS
+
+  (Chèn toàn bộ phần giải trình tư duy phân tích toán học các điểm biên Boundary, Boundary-1, Boundary+1 chi tiết bằng tiếng Việt tại đây)
+
+  ### 2. BOUNDARY TEST CASES TABLE
+
+  (Chèn bảng test cases biên đầy đủ từ 6-9 kịch bản trở lên, định dạng chuẩn có chứa thẻ <br> trong các ô dữ liệu)
+
+  ***
+
+  [File: FRXX_AI_Audit_Log.md]
+
+  # AI AUDIT REPORT (DỮ LIỆU KIỂM TOÁN HỆ THỐNG)
+
+  ### AI tool name
+  - [Tên model đang thực thi skill này]
+
+  ### Date and time
+  - [Điền ngày giờ chạy thực tế tại đây]
+
+  ### Prompt
+  - **System Core Blueprint (Full Verbatim Content):**
+
+    (Chèn toàn bộ nguyên văn nội dung của file skill này vào đây,
+    từ dòng ROLE DEFINITION đến hết OUTPUT SPECIFICATION,
+    để làm bằng chứng kiểm toán đầy đủ)
+
+  - **Input Feature Specification Used:**
+
+    (Chèn lại nguyên văn toàn bộ nội dung tài liệu Spec thô
+    ban đầu của người dùng vào đây)
+
+  ### The AI output
+
+  (Chèn toàn bộ nội dung đã sinh ra từ PHASE 2 và PHASE 3 vào đây —
+  bao gồm phần giải trình Domain Testing, bảng DT test cases,
+  phần giải trình BVA, và bảng BVA test cases.
+  KHÔNG được viết link tham chiếu ra file khác.)
+
+- **Input Feature Specification Used:**
+
+  FR-12: Kiểm soát truy cập (Access Control)
+  - Phân hệ Admin chỉ dành cho tài khoản có `role = 'admin'`.
+  - Tất cả các API Admin (`/api/admin/*`) và các API có tính ảnh hưởng dữ liệu (`POST/PUT/DELETE /api/products`, `/api/categories`, `/api/coupons`) đều phải yêu cầu:
+  1. Token JWT hợp lệ.
+  2. `role = 'admin'` trong Token.
+
+### The AI output
+
+# BÁO CÁO KẾT QUẢ THIẾT KẾ KỊCH BẢN KIỂM THỬ
+
+## I. KỊCH BẢN KIỂM THỬ THEO KỸ THUẬT PHÂN LỚP TƯƠNG ĐƯƠNG
+
+### 1. PHÂN TÍCH MIỀN DỮ LIỆU CHI TIẾT
+
+**1. Danh sách các biến đầu vào**
+
+- Đường dẫn API được gọi.
+- Phương thức HTTP của yêu cầu.
+- Token JWT trong tiêu đề Authorization.
+- Giá trị vai trò `role` được nhúng trong token.
+- Trạng thái hiệu lực của token, bao gồm còn hạn, hết hạn và chữ ký hợp lệ.
+
+**2. Kiểu dữ liệu và ràng buộc chi tiết**
+
+- Đường dẫn API là chuỗi ký tự và phải khớp đúng một trong hai nhóm quy tắc nghiệp vụ sau:
+  - Nhóm 1: mọi API thuộc tiền tố `/api/admin/*`.
+  - Nhóm 2: các API có tác động dữ liệu gồm `POST`, `PUT`, `DELETE` trên `/api/products`, `/api/categories`, `/api/coupons`.
+- Phương thức HTTP là chuỗi mô tả hành động. Trong phạm vi đặc tả này, các phương thức có ý nghĩa kiểm soát là `POST`, `PUT`, `DELETE` và các phương thức còn lại được xem là ngoài phạm vi tác động dữ liệu.
+- Token JWT là chuỗi mang thông tin xác thực. Đặc tả yêu cầu token phải hợp lệ, có chữ ký đúng và còn hiệu lực.
+- Vai trò `role` là chuỗi logic trong token. Đặc tả yêu cầu giá trị phải là `admin`.
+- Trạng thái token là thuộc tính logic của xác thực. Nếu token không tồn tại, sai định dạng, chữ ký sai hoặc hết hạn thì đều được xem là không hợp lệ.
+
+**3. Quy tắc nghiệp vụ và logic ngầm**
+
+- Mọi chức năng thuộc phân hệ Admin chỉ được phép truy cập nếu token JWT hợp lệ và `role = 'admin'`.
+- Mọi API có tác động dữ liệu thuộc nhóm `POST`, `PUT`, `DELETE` trên các tài nguyên `products`, `categories`, `coupons` cũng phải tuân thủ cùng quy tắc xác thực và phân quyền như trên.
+- Nếu thiếu token hoặc token không hợp lệ thì hệ thống phải từ chối trước khi xét đến vai trò.
+- Nếu token hợp lệ nhưng vai trò không phải `admin` thì hệ thống phải từ chối truy cập dù endpoint là Admin hay là API tác động dữ liệu.
+- Nếu token hợp lệ và vai trò là `admin` thì yêu cầu phải được chấp nhận đối với đúng các endpoint nằm trong phạm vi đặc tả.
+- Các endpoint không nằm trong phạm vi đặc tả không được suy diễn thêm ràng buộc ngoài những gì đã nêu.
+
+### 2. BẢNG KỊCH BẢN KIỂM THỬ MIỀN DỮ LIỆU
+
+| Test Case ID | Description                                             | Input Data                                                                                                                                                                                                                                                                                                      | Test Steps                                                                                                                                                                                                                                                                                                                                        | Expected Result                                                                  | Actual Result  | Status    | Tested By | Date Tested |
+| ------------ | ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | -------------- | --------- | --------- | ----------- |
+| FR-12-DT-01  | Truy cập API Admin bằng token hợp lệ và vai trò admin   | Phương thức HTTP: GET<br>Đường dẫn API: /api/admin/dashboard<br>Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYWRtaW4iLCJleHAiOjQ3MjM2ODk5OTl9.abc123signature<br>Role trong token: admin<br>Trạng thái token: hợp lệ, còn hạn                                                                         | 1. Mở Postman hoặc Swagger UI.<br>2. Chọn phương thức GET cho đường dẫn `/api/admin/dashboard`.<br>3. Thêm tiêu đề `Authorization` với giá trị `Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYWRtaW4iLCJleHAiOjQ3MjM2ODk5OTl9.abc123signature`.<br>4. Gửi yêu cầu.                                                                                     | Hệ thống cho phép truy cập và trả về phản hồi thành công theo nghiệp vụ của API. | Chưa thực hiện | Chưa chạy | Copilot   | 2026-06-21  |
+| FR-12-DT-02  | Truy cập API Admin khi thiếu token JWT                  | Phương thức HTTP: GET<br>Đường dẫn API: /api/admin/dashboard<br>Authorization: rỗng<br>Role trong token: không có<br>Trạng thái token: không tồn tại                                                                                                                                                            | 1. Mở Postman hoặc Swagger UI.<br>2. Chọn phương thức GET cho đường dẫn `/api/admin/dashboard`.<br>3. Không nhập tiêu đề `Authorization`.<br>4. Gửi yêu cầu.                                                                                                                                                                                      | Hệ thống từ chối truy cập vì thiếu token JWT hợp lệ.                             | Chưa thực hiện | Chưa chạy | Copilot   | 2026-06-21  |
+| FR-12-DT-03  | Truy cập API Admin bằng token đã hết hạn                | Phương thức HTTP: GET<br>Đường dẫn API: /api/admin/orders<br>Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYWRtaW4iLCJleHAiOjE2MDAwMDAwMDB9.expiredsignature<br>Role trong token: admin<br>Trạng thái token: hết hạn                                                                                   | 1. Mở Postman hoặc Swagger UI.<br>2. Chọn phương thức GET cho đường dẫn `/api/admin/orders`.<br>3. Thêm tiêu đề `Authorization` với giá trị `Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYWRtaW4iLCJleHAiOjE2MDAwMDAwMDB9.expiredsignature`.<br>4. Gửi yêu cầu.                                                                                       | Hệ thống từ chối truy cập vì token JWT hết hạn.                                  | Chưa thực hiện | Chưa chạy | Copilot   | 2026-06-21  |
+| FR-12-DT-04  | Truy cập API Admin bằng token hợp lệ nhưng vai trò user | Phương thức HTTP: GET<br>Đường dẫn API: /api/admin/users<br>Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoidXNlciIsImV4cCI6NDcyMzY4OTk5OX0.userrole123<br>Role trong token: user<br>Trạng thái token: hợp lệ, còn hạn                                                                                   | 1. Mở Postman hoặc Swagger UI.<br>2. Chọn phương thức GET cho đường dẫn `/api/admin/users`.<br>3. Thêm tiêu đề `Authorization` với giá trị `Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoidXNlciIsImV4cCI6NDcyMzY4OTk5OX0.userrole123`.<br>4. Gửi yêu cầu.                                                                                              | Hệ thống từ chối truy cập vì vai trò trong token không phải `admin`.             | Chưa thực hiện | Chưa chạy | Copilot   | 2026-06-21  |
+| FR-12-DT-05  | Tạo sản phẩm bằng token admin hợp lệ                    | Phương thức HTTP: POST<br>Đường dẫn API: /api/products<br>Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYWRtaW4iLCJleHAiOjQ3MjM2ODk5OTl9.abc123signature<br>Role trong token: admin<br>Trạng thái token: hợp lệ, còn hạn<br>Dữ liệu gửi kèm: {"name":"Balo ABC","price":250000,"categoryId":"CAT-001"} | 1. Mở Postman hoặc Swagger UI.<br>2. Chọn phương thức POST cho đường dẫn `/api/products`.<br>3. Thêm tiêu đề `Authorization` với giá trị `Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYWRtaW4iLCJleHAiOjQ3MjM2ODk5OTl9.abc123signature`.<br>4. Nhập thân yêu cầu JSON `{"name":"Balo ABC","price":250000,"categoryId":"CAT-001"}`.<br>5. Gửi yêu cầu. | Hệ thống cho phép tạo sản phẩm và trả về phản hồi thành công.                    | Chưa thực hiện | Chưa chạy | Copilot   | 2026-06-21  |
+| FR-12-DT-06  | Cập nhật danh mục bằng token admin hợp lệ               | Phương thức HTTP: PUT<br>Đường dẫn API: /api/categories/CAT-001<br>Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYWRtaW4iLCJleHAiOjQ3MjM2ODk5OTl9.abc123signature<br>Role trong token: admin<br>Trạng thái token: hợp lệ, còn hạn<br>Dữ liệu gửi kèm: {"name":"Phụ kiện học tập"}                      | 1. Mở Postman hoặc Swagger UI.<br>2. Chọn phương thức PUT cho đường dẫn `/api/categories/CAT-001`.<br>3. Thêm tiêu đề `Authorization` với giá trị `Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYWRtaW4iLCJleHAiOjQ3MjM2ODk5OTl9.abc123signature`.<br>4. Nhập thân yêu cầu JSON `{"name":"Phụ kiện học tập"}`.<br>5. Gửi yêu cầu.                      | Hệ thống cho phép cập nhật danh mục và trả về phản hồi thành công.               | Chưa thực hiện | Chưa chạy | Copilot   | 2026-06-21  |
+| FR-12-DT-07  | Xóa coupon bằng token admin hợp lệ                      | Phương thức HTTP: DELETE<br>Đường dẫn API: /api/coupons/SALE10<br>Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYWRtaW4iLCJleHAiOjQ3MjM2ODk5OTl9.abc123signature<br>Role trong token: admin<br>Trạng thái token: hợp lệ, còn hạn                                                                       | 1. Mở Postman hoặc Swagger UI.<br>2. Chọn phương thức DELETE cho đường dẫn `/api/coupons/SALE10`.<br>3. Thêm tiêu đề `Authorization` với giá trị `Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYWRtaW4iLCJleHAiOjQ3MjM2ODk5OTl9.abc123signature`.<br>4. Gửi yêu cầu.                                                                                   | Hệ thống cho phép xóa coupon và trả về phản hồi thành công.                      | Chưa thực hiện | Chưa chạy | Copilot   | 2026-06-21  |
+| FR-12-DT-08  | Tạo sản phẩm bằng token hợp lệ nhưng vai trò user       | Phương thức HTTP: POST<br>Đường dẫn API: /api/products<br>Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoidXNlciIsImV4cCI6NDcyMzY4OTk5OX0.userrole123<br>Role trong token: user<br>Trạng thái token: hợp lệ, còn hạn<br>Dữ liệu gửi kèm: {"name":"Bút bi Xanh","price":12000,"categoryId":"CAT-002"}     | 1. Mở Postman hoặc Swagger UI.<br>2. Chọn phương thức POST cho đường dẫn `/api/products`.<br>3. Thêm tiêu đề `Authorization` với giá trị `Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoidXNlciIsImV4cCI6NDcyMzY4OTk5OX0.userrole123`.<br>4. Nhập thân yêu cầu JSON `{"name":"Bút bi Xanh","price":12000,"categoryId":"CAT-002"}`.<br>5. Gửi yêu cầu.    | Hệ thống từ chối truy cập vì vai trò trong token không phải `admin`.             | Chưa thực hiện | Chưa chạy | Copilot   | 2026-06-21  |
+| FR-12-DT-09  | Xóa danh mục khi không gửi token JWT                    | Phương thức HTTP: DELETE<br>Đường dẫn API: /api/categories/CAT-001<br>Authorization: rỗng<br>Role trong token: không có<br>Trạng thái token: không tồn tại                                                                                                                                                      | 1. Mở Postman hoặc Swagger UI.<br>2. Chọn phương thức DELETE cho đường dẫn `/api/categories/CAT-001`.<br>3. Không nhập tiêu đề `Authorization`.<br>4. Gửi yêu cầu.                                                                                                                                                                                | Hệ thống từ chối truy cập vì thiếu token JWT hợp lệ.                             | Chưa thực hiện | Chưa chạy | Copilot   | 2026-06-21  |
+| FR-12-DT-10  | Gọi API Admin bằng token có chữ ký sai                  | Phương thức HTTP: GET<br>Đường dẫn API: /api/admin/settings<br>Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYWRtaW4iLCJleHAiOjQ3MjM2ODk5OTl9.wrongsignature999<br>Role trong token: admin<br>Trạng thái token: chữ ký không hợp lệ                                                                    | 1. Mở Postman hoặc Swagger UI.<br>2. Chọn phương thức GET cho đường dẫn `/api/admin/settings`.<br>3. Thêm tiêu đề `Authorization` với giá trị `Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYWRtaW4iLCJleHAiOjQ3MjM2ODk5OTl9.wrongsignature999`.<br>4. Gửi yêu cầu.                                                                                    | Hệ thống từ chối truy cập vì token JWT không hợp lệ do chữ ký sai.               | Chưa thực hiện | Chưa chạy | Copilot   | 2026-06-21  |
+
+## II. KỊCH BẢN KIỂM THỬ THEO KỸ THUẬT GIÁ TRỊ BIÊN
+
+### 1. PHÂN TÍCH GIÁ TRỊ BIÊN CHI TIẾT
+
+**1. Kết luận phạm vi biên**
+
+Đặc tả chức năng này không công bố bất kỳ ràng buộc số học, giới hạn độ dài chuỗi, khoảng giá trị tối thiểu hoặc tối đa nào cho các biến đầu vào. Do đó, không có miền biên số học hoặc biên độ dài nào được nêu rõ để áp dụng kỹ thuật Giá trị Biên một cách đúng phạm vi.
+
+**2. Phân tích theo góc nhìn QA**
+
+- Kỹ thuật Giá trị Biên chỉ nên áp dụng khi đặc tả có nêu một giới hạn cụ thể như độ dài tối thiểu, độ dài tối đa, giá trị nhỏ nhất hoặc giá trị lớn nhất.
+- Với đặc tả hiện tại, các quy tắc xác thực là quy tắc logic định tính: token phải hợp lệ, vai trò phải là `admin`, endpoint phải thuộc phạm vi bảo vệ.
+- Vì không có ngưỡng số học cụ thể nên không thể xác định hợp lệ cho các điểm `Boundary`, `Boundary - 1`, `Boundary + 1` một cách khách quan.
+- Nếu tự ý gán ngưỡng cho token, vai trò hoặc endpoint thì sẽ vi phạm quy tắc không suy diễn ngoài đặc tả.
+
+**3. Kết luận kiểm thử biên**
+
+- Không phát hiện biến đầu vào nào có ràng buộc biên được chỉ rõ trong đặc tả.
+- Không thiết kế bộ test biên định lượng cho chức năng này.
+- Phần kiểm thử phù hợp nhất cho phạm vi này là phân lớp tương đương và kiểm thử logic truy cập.
+
+### 2. BẢNG KỊCH BẢN KIỂM THỬ BIÊN
+
+| Test Case ID | Description                                                                       | Input Data                                                                                                                                                      | Test Steps                                                                                                                                                                                                                                                                                        | Expected Result                                                              | Actual Result  | Status    | Tested By | Date Tested |
+| ------------ | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | -------------- | --------- | --------- | ----------- |
+| FR-12-BVA-01 | Xác nhận không có ràng buộc biên số học hoặc biên độ dài được nêu rõ trong đặc tả | Biến đầu vào có ràng buộc biên: Không có<br>Giá trị `Boundary`: Không áp dụng<br>Giá trị `Boundary - 1`: Không áp dụng<br>Giá trị `Boundary + 1`: Không áp dụng | 1. Rà soát đặc tả chức năng kiểm soát truy cập cho các ngưỡng số học và ngưỡng độ dài.<br>2. Xác nhận không có giới hạn tối thiểu hoặc tối đa nào được công bố cho token, vai trò hoặc đường dẫn API.<br>3. Ghi nhận kết luận không thể sinh test biên định lượng mà không suy diễn ngoài đặc tả. | Xác nhận chính thức rằng kỹ thuật Giá trị Biên không áp dụng cho đặc tả này. | Chưa thực hiện | Chưa chạy | Copilot   | 2026-06-21  |

@@ -185,6 +185,74 @@ BVA không áp dụng cho FR-10 vì không có ràng buộc số học hoặc đ
 - Tuy nhiên, ở phần mô tả bên dưới lại có **"Khi đơn hàng đã ở trạng thái shipping, User không được phép tự hủy — chỉ Admin mới có thể thao tác."** -> Thực chất `Admin` có thể hủy từ `shipping`.
 - Chính sự mâu thuẫn này trong spec đã dẫn đến việc AI tạo ra test case FR-10-DT-09 với Expected Result sai. 
 
+# FR-12: Kiểm soát truy cập (Access Control)
+## Domain Testing
+### Giải thích
+
+**1. Danh sách các biến đầu vào**
+
+- Đường dẫn API được gọi.
+- Phương thức HTTP của yêu cầu.
+- Token JWT trong tiêu đề Authorization.
+- Giá trị vai trò `role` được nhúng trong token.
+- Trạng thái hiệu lực của token, bao gồm còn hạn, hết hạn và chữ ký hợp lệ.
+
+**2. Kiểu dữ liệu và ràng buộc chi tiết**
+
+- Đường dẫn API là chuỗi ký tự và phải khớp đúng một trong hai nhóm quy tắc nghiệp vụ sau:
+  - Nhóm 1: mọi API thuộc tiền tố `/api/admin/*`.
+  - Nhóm 2: các API có tác động dữ liệu gồm `POST`, `PUT`, `DELETE` trên `/api/products`, `/api/categories`, `/api/coupons`.
+- Phương thức HTTP là chuỗi mô tả hành động. Trong phạm vi đặc tả này, các phương thức có ý nghĩa kiểm soát là `POST`, `PUT`, `DELETE` và các phương thức còn lại được xem là ngoài phạm vi tác động dữ liệu.
+- Token JWT là chuỗi mang thông tin xác thực. Đặc tả yêu cầu token phải hợp lệ, có chữ ký đúng và còn hiệu lực.
+- Vai trò `role` là chuỗi logic trong token. Đặc tả yêu cầu giá trị phải là `admin`.
+- Trạng thái token là thuộc tính logic của xác thực. Nếu token không tồn tại, sai định dạng, chữ ký sai hoặc hết hạn thì đều được xem là không hợp lệ.
+
+**3. Quy tắc nghiệp vụ và logic ngầm**
+
+- Mọi chức năng thuộc phân hệ Admin chỉ được phép truy cập nếu token JWT hợp lệ và `role = 'admin'`.
+- Mọi API có tác động dữ liệu thuộc nhóm `POST`, `PUT`, `DELETE` trên các tài nguyên `products`, `categories`, `coupons` cũng phải tuân thủ cùng quy tắc xác thực và phân quyền như trên.
+- Nếu thiếu token hoặc token không hợp lệ thì hệ thống phải từ chối trước khi xét đến vai trò.
+- Nếu token hợp lệ nhưng vai trò không phải `admin` thì hệ thống phải từ chối truy cập dù endpoint là Admin hay là API tác động dữ liệu.
+- Nếu token hợp lệ và vai trò là `admin` thì yêu cầu phải được chấp nhận đối với đúng các endpoint nằm trong phạm vi đặc tả.
+- Các endpoint không nằm trong phạm vi đặc tả không được suy diễn thêm ràng buộc ngoài những gì đã nêu.
+
+### 2. Domain Test Cases
+
+| Test Case ID | Description | Input Data | Test Steps | Expected Result | Actual Result | Status | Tested By | Date Tested |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| FR-12-DT-01 | Truy cập API Admin bằng token hợp lệ và vai trò admin | Phương thức HTTP: GET<br>Đường dẫn API: /api/admin/users<br>Authorization: Bearer {{admin_token}}<br>Role trong token: admin<br>Trạng thái token: hợp lệ, còn hạn | 1. Mở Postman hoặc Swagger UI.<br>2. Gọi POST /api/login với credentials hợp lệ của tài khoản admin để lấy token thật.<br>3. Chọn phương thức GET cho đường dẫn `/api/admin/users`.<br>4. Thêm tiêu đề `Authorization` với giá trị `Bearer {{admin_token}}`.<br>5. Gửi yêu cầu. | Hệ thống cho phép truy cập và trả về phản hồi thành công theo nghiệp vụ của API. |  |  |  |  |
+| FR-12-DT-02 | Truy cập API Admin khi thiếu token JWT | Phương thức HTTP: GET<br>Đường dẫn API: /api/admin/users<br>Authorization: rỗng<br>Role trong token: không có<br>Trạng thái token: không tồn tại | 1. Mở Postman hoặc Swagger UI.<br>2. Chọn phương thức GET cho đường dẫn `/api/admin/users`.<br>3. Không nhập tiêu đề `Authorization`.<br>4. Gửi yêu cầu. | Hệ thống từ chối truy cập vì thiếu token JWT hợp lệ. |  |  |  |  |
+| FR-12-DT-03 | Truy cập API Admin bằng token đã hết hạn | Phương thức HTTP: GET<br>Đường dẫn API: /api/admin/users<br>Authorization: Bearer {{expired_admin_token}}<br>Role trong token: admin<br>Trạng thái token: hết hạn | 1. Mở Postman hoặc Swagger UI.<br>2. Lấy một token JWT của admin đã hết hạn (từ phiên đăng nhập cũ hoặc sinh bằng tool giả lập với thời gian hết hạn trong quá khứ).<br>3. Chọn phương thức GET cho đường dẫn `/api/admin/users`.<br>4. Thêm tiêu đề `Authorization` với giá trị `Bearer {{expired_admin_token}}`.<br>5. Gửi yêu cầu. | Hệ thống từ chối truy cập vì token JWT hết hạn. |  |  |  |  |
+| FR-12-DT-04 | Truy cập API Admin bằng token hợp lệ nhưng vai trò user | Phương thức HTTP: GET<br>Đường dẫn API: /api/admin/users<br>Authorization: Bearer {{user_token}}<br>Role trong token: user<br>Trạng thái token: hợp lệ, còn hạn | 1. Mở Postman hoặc Swagger UI.<br>2. Gọi POST /api/login với credentials hợp lệ của tài khoản USER thường để lấy token thật.<br>3. Chọn phương thức GET cho đường dẫn `/api/admin/users`.<br>4. Thêm tiêu đề `Authorization` với giá trị `Bearer {{user_token}}`.<br>5. Gửi yêu cầu. | Hệ thống từ chối truy cập vì vai trò trong token không phải `admin`. |  |  |  |  |
+| FR-12-DT-05 | Gọi API Admin bằng token có chữ ký sai | Phương thức HTTP: GET<br>Đường dẫn API: /api/admin/users<br>Authorization: Bearer {{invalid_signature_token}}<br>Role trong token: admin<br>Trạng thái token: chữ ký không hợp lệ | 1. Mở Postman hoặc Swagger UI.<br>2. Gọi POST /api/login với credentials hợp lệ của tài khoản admin để lấy token thật, sau đó cố tình sửa đổi vài ký tự ở phần cuối của token (phần signature).<br>3. Chọn phương thức GET cho đường dẫn `/api/admin/users`.<br>4. Thêm tiêu đề `Authorization` với giá trị `Bearer {{invalid_signature_token}}`.<br>5. Gửi yêu cầu. | Hệ thống từ chối truy cập vì token JWT không hợp lệ do chữ ký sai. |  |  |  |  |
+
+## Boundary Value Analysis
+### Giải thích
+**1. Kết luận phạm vi biên**
+
+Đặc tả chức năng này không công bố bất kỳ ràng buộc số học, giới hạn độ dài chuỗi, khoảng giá trị tối thiểu hoặc tối đa nào cho các biến đầu vào. Do đó, không có miền biên số học hoặc biên độ dài nào được nêu rõ để áp dụng kỹ thuật Giá trị Biên một cách đúng phạm vi.
+
+**2. Phân tích theo góc nhìn QA**
+
+- Kỹ thuật Giá trị Biên chỉ nên áp dụng khi đặc tả có nêu một giới hạn cụ thể như độ dài tối thiểu, độ dài tối đa, giá trị nhỏ nhất hoặc giá trị lớn nhất.
+- Với đặc tả hiện tại, các quy tắc xác thực là quy tắc logic định tính: token phải hợp lệ, vai trò phải là `admin`, endpoint phải thuộc phạm vi bảo vệ.
+- Vì không có ngưỡng số học cụ thể nên không thể xác định hợp lệ cho các điểm `Boundary`, `Boundary - 1`, `Boundary + 1` một cách khách quan.
+- Nếu tự ý gán ngưỡng cho token, vai trò hoặc endpoint thì sẽ vi phạm quy tắc không suy diễn ngoài đặc tả.
+
+**3. Kết luận kiểm thử biên**
+
+- Không phát hiện biến đầu vào nào có ràng buộc biên được chỉ rõ trong đặc tả.
+- Không thiết kế bộ test biên định lượng cho chức năng này.
+- Phần kiểm thử phù hợp nhất cho phạm vi này là phân lớp tương đương và kiểm thử logic truy cập.
+
+### Boundary Test Cases
+BVA không áp dụng cho FR-12 vì không có ràng buộc số học hoặc độ dài được đặc tả.
+
+## AI Gap Analysis
+1. Token JWT trong Input Data không thể dùng trực tiếp để test
+- Toàn bộ 10 test cases đều có token JWT hardcode trong cột Input Data, ví dụ `eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYWRtaW4i...abc123signature`. Đây là token AI tự tạo, không có chữ ký hợp lệ từ secret key của SUT. Tester không thể copy-paste token này vào Postman và expect kết quả đúng — tất cả đều sẽ bị từ chối ở bước verify signature, kể cả các case expected là thành công.
+- Đây là giới hạn inherent của AI khi xử lý security testing — AI không có khả năng biết secret key của hệ thống đang test, nên không thể sinh ra token có chữ ký thật. AI cần được hướng dẫn thay token bằng placeholder và bổ sung bước đăng nhập lấy token vào Test Steps.
+
 # FR-20: Chọn FR-01: Đăng ký tài khoản nhưng làm ở bản Mobile
 ## Domain Testing
 
