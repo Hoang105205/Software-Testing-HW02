@@ -3,6 +3,11 @@
 - MSSV: 23127047
 
 # FR-01: Đăng ký tài khoản
+- Người dùng phải cung cấp: Họ Tên, Email, Mật khẩu.
+- Email phải có định dạng hợp lệ (user@domain.com) và là duy nhất trong hệ thống.
+- Yêu cầu mật khẩu mạnh: Tối thiểu 8 ký tự, có ít nhất 1 chữ hoa, 1 chữ thường, 1 chữ số và 1 ký tự đặc biệt (@, $, !, %, *, ?, &).
+- Phải có trường Xác nhận mật khẩu — hệ thống từ chối nếu hai trường không khớp.
+- Sau khi đăng ký thành công, người dùng được chuyển tới trang Đăng nhập.
 
 ## Domain Testing
 
@@ -106,6 +111,25 @@ Từ góc nhìn kiểm thử, các điểm 0, 1 và 2 là vùng nhạy cảm vì
 - Về bản chất, kiểm tra "0 chữ hoa/thường/số/đặc biệt" là phân hoạch miền không hợp lệ (Invalid Partition) — thuộc Domain Testing, không phải BVA. AI đã xếp nhầm chúng vào BVA để đủ số lượng tối thiểu 6-9 cases theo yêu cầu trong prompt (do prompt lúc chạy Function này của em chưa đủ tối ưu), thay vì chỉ giữ 3 case biên độ dài mật khẩu thực sự thuộc BVA.
 
 # FR-10: Trạng thái Đơn hàng (Order State Machine)
+Đơn hàng có 5 trạng thái và phải tuân theo sơ đồ chuyển đổi sau:
+```text
+                 [Admin xác nhận]          [Admin giao hàng]      [Admin hoàn tất]
+  ┌──────────┐ ─────────────────► ┌───────────┐ ──────────────► ┌──────────┐ ──────────► ┌───────────┐
+  │ pending  │                    │ confirmed │                 │ shipping │             │ delivered │
+  └──────────┘                    └───────────┘                 └──────────┘             └───────────┘
+       │                               │
+       │ [User/Admin hủy]              │ [User/Admin hủy]
+       ▼                               ▼
+  ┌──────────┐                    ┌──────────┐
+  │ canceled │                    │ canceled │
+  └──────────┘                    └──────────┘
+```
+Ràng buộc trạng thái kết thúc (Final States):
+
+- Trạng thái delivered và canceled là trạng thái kết thúc — không được phép chuyển sang bất kỳ trạng thái nào khác.
+- Khi đơn hàng đã ở trạng thái shipping, User không được phép tự hủy — chỉ Admin mới có thể thao tác.
+- Mọi chuyển đổi không hợp lệ phải trả về lỗi với thông báo phù hợp.
+
 ## Domain Testing
 ### Giải thích
 Đối với FR-10: Trạng thái Đơn hàng (Order State Machine), các biến đầu vào và ràng buộc nghiệp vụ cần được bóc tách như sau:
@@ -186,6 +210,11 @@ BVA không áp dụng cho FR-10 vì không có ràng buộc số học hoặc đ
 - Chính sự mâu thuẫn này trong spec đã dẫn đến việc AI tạo ra test case FR-10-DT-09 với Expected Result sai. 
 
 # FR-12: Kiểm soát truy cập (Access Control)
+- Phân hệ Admin chỉ dành cho tài khoản có role = 'admin'.
+- Tất cả các API Admin (/api/admin/*) và các API có tính ảnh hưởng dữ liệu (POST/PUT/DELETE /api/products, /api/categories, /api/coupons) đều phải yêu cầu:  
+   - Token JWT hợp lệ.  
+   - role = 'admin' trong Token.
+
 ## Domain Testing
 ### Giải thích
 
@@ -254,6 +283,12 @@ BVA không áp dụng cho FR-12 vì không có ràng buộc số học hoặc đ
 - Đây là giới hạn inherent của AI khi xử lý security testing — AI không có khả năng biết secret key của hệ thống đang test, nên không thể sinh ra token có chữ ký thật. AI cần được hướng dẫn thay token bằng placeholder và bổ sung bước đăng nhập lấy token vào Test Steps.
 
 # FR-20: Chọn FR-01: Đăng ký tài khoản nhưng làm ở bản Mobile
+- Người dùng phải cung cấp: Họ Tên, Email, Mật khẩu.
+- Email phải có định dạng hợp lệ (user@domain.com) và là duy nhất trong hệ thống.
+- Yêu cầu mật khẩu mạnh: Tối thiểu 8 ký tự, có ít nhất 1 chữ hoa, 1 chữ thường, 1 chữ số và 1 ký tự đặc biệt (@, $, !, %, *, ?, &).
+- Phải có trường Xác nhận mật khẩu — hệ thống từ chối nếu hai trường không khớp.
+- Sau khi đăng ký thành công, người dùng được chuyển tới trang Đăng nhập.
+
 ## Domain Testing
 
 ### Giải thích
